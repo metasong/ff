@@ -35,7 +35,7 @@
             <animate attributeName="fill" values="#333333;#444444;#333333" dur="3s" repeatCount="indefinite" />
           </path>
           <!-- Very subtle reflection/sheen to suggest metal -->
-          <path d="M125 45L130 50L135 45" stroke="#777777" stroke-width="1" stroke-linecap="round" />
+          <path d="M130 50 L140 55 L130 60" stroke="#777777" stroke-width="1" stroke-linecap="round" />
         </g>
 
         <!-- Gradients for the molten effect -->
