@@ -1,9 +1,10 @@
 ![](./resources/logo.svg)
-# ff
+
 Forge File Manager: Forge your path through the filesystem. (Command, Craft and Control. Built for builders.)
+
 🔥🔨🧱🗂️
 
-# Conceptual Philosophy
+# Philosophy
 
 * Crafting & Customization: Just like blacksmiths forge tools, users can forge their workflow — customizable keybindings, plugins, macros.
 * Power & Precision: Command-driven, no-nonsense interface with powerful features.
