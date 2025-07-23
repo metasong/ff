@@ -1,0 +1,2 @@
+# V0 (MVP)
+1. UI: three pannels:  4: 6 ~~2:3:5~~   ~~1. left: parent folder~~   1. left: current folder   1. right: content of current selection   1. top line: breadcrumbs: folder structure      1. can expand with pop up to change current item   1. bottom line: status and command line
