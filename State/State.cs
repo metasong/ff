@@ -2,13 +2,10 @@
 
 internal class State
 {
-    protected readonly FileDialog Parent;
-
-    public State(IDirectoryInfo dir, FileDialog parent)
+    public State(IDirectoryInfo dir, string path)
     {
         Directory = dir;
-        Parent = parent;
-        Path = parent.Path;
+        Path =path;
 
         RefreshChildren();
     }

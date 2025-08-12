@@ -1,21 +1,20 @@
-﻿namespace TerminalFileManager
-{
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            Application.Init();
+﻿namespace TerminalFileManager;
 
-            try
-            {
-                var fileManager = new FileManagerWindow();
-                Application.Run(fileManager);
-                fileManager.Dispose();
-            }
-            finally
-            {
-                Application.Shutdown();
-            }
+class Program
+{
+    static void Main(string[] args)
+    {
+        Application.Init();
+
+        try
+        {
+            var fileManager = new FileManagerWindow();
+            Application.Run(fileManager);
+            fileManager.Dispose();
+        }
+        finally
+        {
+            Application.Shutdown();
         }
     }
 }

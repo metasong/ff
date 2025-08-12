@@ -6,7 +6,7 @@
 /// </summary>
 internal class FileSystemState
 {
-    private readonly CultureInfo culture;
+    public readonly CultureInfo Culture;
 
     /* ---- Colors used by the ls command line tool ----
      *
@@ -38,7 +38,7 @@ internal class FileSystemState
     /// <param name="culture"></param>
     public FileSystemState(IFileSystemInfo fileSystemInfo, CultureInfo culture)
     {
-        this.culture = culture;
+        Culture = culture;
         FileSystemInfo = fileSystemInfo;
     }
 
@@ -46,7 +46,7 @@ internal class FileSystemState
     public IFileSystemInfo FileSystemInfo { get; }
 
     public string HumanReadableLength => FileSystemInfo is IFileInfo fi
-        ? GetHumanReadableFileSize(MachineReadableLength, culture)
+        ? GetHumanReadableFileSize(MachineReadableLength, Culture)
         : string.Empty;
 
     public bool IsDir => !(FileSystemInfo is IFileInfo);
@@ -56,6 +56,9 @@ internal class FileSystemState
 
     public DateTime? LastWriteTime => FileSystemInfo.LastWriteTime;
     public long MachineReadableLength => FileSystemInfo is IFileInfo fi ? fi.Length : 0;
+    /// <summary>
+    /// Name with extension
+    /// </summary>
     public string Name => IsParent ? ".." : FileSystemInfo.Name;
     public string Type => FileSystemInfo is IFileInfo fi ? fi.Extension : $"<{Strings.Directory}>";
 
