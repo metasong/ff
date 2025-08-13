@@ -12,6 +12,7 @@ Forge File Manager: Forge your path through the filesystem. (Command, Craft and 
 * Resilience: Built to handle large directory trees, symbolic links, git status, etc.
 * Integration: Can "forge" links with other tools (git, fzf, bat, etc.).
 * Template-based Creation: Create files or folders from templates (e.g., boilerplate code).
+* multiple language support.
 
 
 Colors: Dark backgrounds with ember/orange highlights (to reflect molten metal & heat).

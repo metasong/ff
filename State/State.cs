@@ -1,4 +1,6 @@
-﻿namespace ff.State;
+﻿using System.IO;
+
+namespace ff.State;
 
 internal class State
 {
@@ -22,44 +24,9 @@ internal class State
     {
         try
         {
-            List<FileSystemState> children;
 
-            // if directories only
-            if (Parent.OpenMode == OpenMode.Directory)
-            {
-                children = dir.GetDirectories()
-                              .Select(e => new FileSystemState(e, Parent.Style.Culture))
-                              .ToList();
-            }
-            else
-            {
-                children = dir.GetFileSystemInfos()
-                              .Select(e => new FileSystemState(e, Parent.Style.Culture))
-                              .ToList();
-            }
-
-            // if only allowing specific file types
-            if (Parent.AllowedTypes.Any() && Parent.OpenMode == OpenMode.File)
-            {
-                children = children.Where(
-                                           c => c.IsDir
-                                                || c.FileSystemInfo is IFileInfo f
-                                                    && Parent.IsCompatibleWithAllowedExtensions(f)
-                                          )
-                                   .ToList();
-            }
-
-            // if there's a UI filter in place too
-            if (Parent.CurrentFilter is { })
-            {
-                children = children.Where(MatchesApiFilter).ToList();
-            }
-
-            // allow navigating up as '..'
-            if (dir.Parent is { })
-            {
-                children.Add(new FileSystemState(dir.Parent, Parent.Style.Culture) { IsParent = true });
-            }
+            var children = dir.GetFileSystemInfos()
+                .Select(e => new FileSystemState(e, Parent.Style.Culture));
 
             return children;
         }
@@ -68,13 +35,6 @@ internal class State
             // Access permissions Exceptions, Dir not exists etc
             return [];
         }
-    }
-
-    protected bool MatchesApiFilter(FileSystemState arg)
-    {
-        return arg.IsDir
-               || arg.FileSystemInfo is IFileInfo f
-                   && Parent.CurrentFilter.IsAllowed(f.FullName);
     }
 
     internal virtual void RefreshChildren()
