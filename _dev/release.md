@@ -8,3 +8,5 @@
       1. can expand with pop up to change current folder
    1. bottom line: status and command line
       1. > to trigger searching
+   1. localization with json config files(remove old one based on .resx file)
+   1. with DI

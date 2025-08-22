@@ -13,6 +13,7 @@ Forge File Manager: Forge your path through the filesystem. (Command, Craft and 
 * Integration: Can "forge" links with other tools (git, fzf, bat, etc.).
 * Template-based Creation: Create files or folders from templates (e.g., boilerplate code).
 * multiple language support.
+* support to view Registry too.
 
 
 Colors: Dark backgrounds with ember/orange highlights (to reflect molten metal & heat).

@@ -10,7 +10,6 @@ global using System.IO.Abstractions;
 global using System.Linq;
 global using System.Text;
 global using System.Threading.Tasks;
-global using ff.Resources;
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Hosting;

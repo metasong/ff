@@ -5,8 +5,8 @@ namespace ff.Search.Filter;
 internal partial class Filters
 {
     [Info("glob", "search files or dirs of name with optional glob string(?*)")]
-    public static IEnumerable<FileSystemState> Glob(
-        this IEnumerable<FileSystemState> items,
+    public static IEnumerable<IItem> Glob(
+        this IEnumerable<IItem> items,
         string? pattern,
         bool matchFullPath = false)
     {

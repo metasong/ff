@@ -3,55 +3,66 @@
 namespace ff.Views.NavigationBar;
 
 /// <summary>
-/// the subview when user want to see/modify the path of current folder
+/// the subview when user want to see/modify the path of current folder, without the selected item part.
 /// </summary>
 internal sealed class NavigationBarTextView: View
 {
-    private readonly IFileSystem _fileSystem;
-    private readonly TextField _tbPath;
-    private string _feedback;
+    private readonly IStateManager stateManager;
+    public IFileSystem FileSystem { get; }
+
+    private readonly TextField tbPath;
+    private string feedback;
 
     /// <summary>
-    ///     Characters to prevent entry into <see cref="_tbPath"/>. Note that this is not using
+    ///     Characters to prevent entry into <see cref="tbPath"/>. Note that this is not using
     ///     <see cref="System.IO.Path.GetInvalidFileNameChars"/> because we do want to allow directory separators, arrow keys
     ///     etc.
     /// </summary>
     private static readonly char[] BadChars = ['"', '<', '>', '|', '*', '?'];
 
-    public NavigationBarTextView(IFileSystem fileSystem)
+    public NavigationBarTextView(IStateManager stateManager)
     {
-        this._fileSystem = fileSystem;
+        this.stateManager = stateManager;
+
         BorderStyle = LineStyle.None;
-        _tbPath = new() { Width = Dim.Fill(), CaptionColor = new(Color.Black) };
-        _tbPath.KeyDown += (s, k) =>
+        tbPath = new() { Width = Dim.Fill(), CaptionColor = new(Color.Black) };
+        tbPath.KeyDown += (s, k) =>
         {
             ClearFeedback();
-
             AcceptIf(k, KeyCode.Enter);
-
             SuppressIfBadChar(k);
         };
-        _tbPath.Autocomplete = new AppendAutocomplete(_tbPath);
-        _tbPath.Autocomplete.SuggestionGenerator = new FilepathSuggestionGenerator();
+        tbPath.Autocomplete = new AppendAutocomplete(tbPath);
+        tbPath.Autocomplete.SuggestionGenerator = new FilepathSuggestionGenerator();
 
-        _tbPath.TextChanged += (s, e) => PathChanged();
-        Add(_tbPath);
+        tbPath.TextChanged += (s, e) => PathChanged();
+        Add(tbPath);
+
+        this.stateManager.StateChanged += (oldState, newState) =>
+        {
+            tbPath.Autocomplete.ClearSuggestions();
+            Path = newState.FullName;
+
+            tbPath.Autocomplete.GenerateSuggestions(
+                new AutocompleteFilepathContext(tbPath.Text, tbPath.CursorPosition, newState)
+            );
+        };
     }
 
     public void OnLoaded()
     {
         SetStyle();
-        _tbPath.Autocomplete.Scheme = new(_tbPath.GetScheme())
+        tbPath.Autocomplete.Scheme = new(tbPath.GetScheme())
         {
-            Normal = new(Color.Black, _tbPath.GetAttributeForRole(VisualRole.Normal).Background)
+            Normal = new(Color.Black, tbPath.GetAttributeForRole(VisualRole.Normal).Background)
         };
 
-        if (_tbPath.Text.Length <= 0)
+        if (tbPath.Text.Length <= 0)
         {
-            Path = _fileSystem.Directory.GetCurrentDirectory();
+            Path = FileSystem.Directory.GetCurrentDirectory();
         }
     }
-    private void ClearFeedback() { _feedback = null; }
+    private void ClearFeedback() { feedback = null; }
 
     private void AcceptIf(Key key, KeyCode isKey)
     {
@@ -72,35 +83,29 @@ internal sealed class NavigationBarTextView: View
 
     private void PathChanged()
     {
-        // avoid re-entry
-        if (_pushingState)
-        {
-            return;
-        }
-
-        var path = _tbPath.Text;
+        var path = tbPath.Text;
 
         if (string.IsNullOrWhiteSpace(path))
         {
             return;
         }
 
-        var dir = _fileSystem.ToDirectoryInfo(path);
+        var dir = FileSystem.ToDirectoryInfo(path);
 
         if (dir.Exists)
         {
-            PushState(dir, true, false);
+            //stateManager.Push();
         }
         else if (dir.Parent?.Exists ?? false)
         {
-            PushState(dir.Parent, true, false);
+            //PushState(dir.Parent, true, false);
         }
 
-        _tbPath.Autocomplete.GenerateSuggestions(
-            new AutocompleteFilepathContext(_tbPath.Text, _tbPath.CursorPosition, StateManager)
+        tbPath.Autocomplete.GenerateSuggestions(
+            new AutocompleteFilepathContext(tbPath.Text, tbPath.CursorPosition, stateManager.CurrentState)
         );
     }
-
+    
     private void SuppressIfBadChar(Key k)
     {
         // don't let user type bad letters
@@ -115,11 +120,11 @@ internal sealed class NavigationBarTextView: View
 
     public string Path
     {
-        get => _tbPath.Text;
+        get => tbPath.Text;
         set
         {
-            _tbPath.Text = value;
-            _tbPath.MoveEnd();
+            tbPath.Text = value;
+            tbPath.MoveEnd();
         }
     }
 }

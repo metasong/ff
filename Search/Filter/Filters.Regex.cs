@@ -6,8 +6,8 @@ namespace ff.Search.Filter;
 internal partial class Filters
 {
     [Info("regex", "search files or dirs of name with optional regex string")]
-    public static IEnumerable<FileSystemState> Regex(
-        this IEnumerable<FileSystemState> items,
+    public static IEnumerable<IItem> Regex(
+        this IEnumerable<IItem> items,
         string? regex,
         bool matchFullPath = false,
         RegexOptions regexOptions = RegexOptions.IgnoreCase)
@@ -21,7 +21,7 @@ internal partial class Filters
 
         return items.Where(item =>
         {
-            var target = matchFullPath ? item.FileSystemInfo.FullName : item.Name;
+            var target = matchFullPath ? item.FullName : item.Name;
             return compiledRegex.IsMatch(target);
         });
     }
