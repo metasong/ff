@@ -8,7 +8,7 @@ internal sealed class NavigationBarTextView: View
     private readonly IStateManager stateManager;
     public IFileSystem FileSystem { get; }
 
-    private readonly TextField tbPath;
+    private TextField tbPath;
     private string feedback;
 
     /// <summary>
@@ -19,13 +19,32 @@ internal sealed class NavigationBarTextView: View
     private static readonly char[] BadChars = ['"', '<', '>', '|', '*', '?'];
 
     public NavigationBarTextView(IStateManager stateManager)
-    {
+    {       
         this.stateManager = stateManager;
+        InitializeComponents();
+        this.stateManager.StateChanged += (oldState, newState) =>
+        {
+            tbPath!.Autocomplete.ClearSuggestions();
+            Path = newState.FullName;
+
+            tbPath.Autocomplete.GenerateSuggestions(
+                new AutocompleteFilePathContext(tbPath.Text, tbPath.CursorPosition, newState)
+            );
+        };
+
+
+
+    }
+
+    public void InitializeComponents()
+    {
         Width = Dim.Fill();
         Height = Dim.Fill();
+
         BorderStyle = LineStyle.None;
         tbPath = new() { Width = Dim.Fill(), Height = Dim.Fill(), CaptionColor = new(Color.Black) };
         Add(tbPath);
+
         tbPath.KeyDown += (s, k) =>
         {
             ClearFeedback();
@@ -33,23 +52,10 @@ internal sealed class NavigationBarTextView: View
             SuppressIfBadChar(k);
         };
         tbPath.Autocomplete = new AppendAutocomplete(tbPath);
-        tbPath.Autocomplete.SuggestionGenerator = new FilepathSuggestionGenerator();
-        OnLoaded();
+        tbPath.Autocomplete.SuggestionGenerator = new PathSuggestionGenerator();
+
         //tbPath.TextChanged += (s, e) => PathChanged();
 
-        this.stateManager.StateChanged += (oldState, newState) =>
-        {
-            tbPath.Autocomplete.ClearSuggestions();
-            Path = newState.FullName;
-
-            tbPath.Autocomplete.GenerateSuggestions(
-                new AutocompleteFilepathContext(tbPath.Text, tbPath.CursorPosition, newState)
-            );
-        };
-    }
-
-    public void OnLoaded()
-    {
         SetStyle();
         tbPath.Autocomplete.Scheme = new(tbPath.GetScheme())
         {
@@ -99,7 +105,7 @@ internal sealed class NavigationBarTextView: View
         }
 
         tbPath.Autocomplete.GenerateSuggestions(
-            new AutocompleteFilepathContext(tbPath.Text, tbPath.CursorPosition, stateManager.CurrentState)
+            new AutocompleteFilePathContext(tbPath.Text, tbPath.CursorPosition, stateManager.CurrentState)
         );
     }
     

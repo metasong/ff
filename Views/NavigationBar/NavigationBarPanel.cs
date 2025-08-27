@@ -17,8 +17,5 @@ public sealed class NavigationBarPanel : View
         Path.AltDirectorySeparatorChar,
         Path.DirectorySeparatorChar
     ];
-    //public void OnLoaded()
-    //{
-    //    textView.OnLoaded();
-    //}
+
 }
