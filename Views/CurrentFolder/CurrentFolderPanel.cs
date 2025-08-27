@@ -55,17 +55,10 @@ public sealed class CurrentFolderPanel : View
 
     }
 
-    private bool ProcessKeyDown(Key key)
+    private bool ProcessKeyDown(Key keyNoAlt)
     {
-
-        if (key == Key.CursorRight)
+        if (keyNoAlt == Key.CursorRight)
         {
-            if (key.IsAlt)
-            {
-                navigator.ForwardAsync();
-                return true;
-            }
-
             var item = itemListTable.TableSource.GetItem(itemListTable.SelectedRow);
             if (item is IContainer container)
             {
@@ -91,18 +84,28 @@ public sealed class CurrentFolderPanel : View
 
             return false;
         }
-        if (key == Key.CursorLeft)
+        if (keyNoAlt == Key.CursorLeft)
         {
-            if (key.IsAlt)
-            {
-                navigator.BackAsync();
-                return true;
-            }
 
             navigator.GoToParentAsync();
             return true;
         }
 
+        if (keyNoAlt.IsAlt)
+        {
+            keyNoAlt = keyNoAlt.NoAlt;
+            if (keyNoAlt == Key.CursorRight)
+            {
+                navigator.ForwardAsync();
+                return true;
+            }
+
+            if (keyNoAlt == Key.CursorLeft)
+            {
+                navigator.BackAsync();
+                return true;
+            }
+        }
         return false;
     }
 

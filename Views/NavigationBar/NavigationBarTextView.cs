@@ -21,9 +21,11 @@ internal sealed class NavigationBarTextView: View
     public NavigationBarTextView(IStateManager stateManager)
     {
         this.stateManager = stateManager;
-
+        Width = Dim.Fill();
+        Height = Dim.Fill();
         BorderStyle = LineStyle.None;
-        tbPath = new() { Width = Dim.Fill(), CaptionColor = new(Color.Black) };
+        tbPath = new() { Width = Dim.Fill(), Height = Dim.Fill(), CaptionColor = new(Color.Black) };
+        Add(tbPath);
         tbPath.KeyDown += (s, k) =>
         {
             ClearFeedback();
@@ -32,9 +34,8 @@ internal sealed class NavigationBarTextView: View
         };
         tbPath.Autocomplete = new AppendAutocomplete(tbPath);
         tbPath.Autocomplete.SuggestionGenerator = new FilepathSuggestionGenerator();
-
-        tbPath.TextChanged += (s, e) => PathChanged();
-        Add(tbPath);
+        OnLoaded();
+        //tbPath.TextChanged += (s, e) => PathChanged();
 
         this.stateManager.StateChanged += (oldState, newState) =>
         {
@@ -55,10 +56,8 @@ internal sealed class NavigationBarTextView: View
             Normal = new(Color.Black, tbPath.GetAttributeForRole(VisualRole.Normal).Background)
         };
 
-        if (tbPath.Text.Length <= 0)
-        {
-            Path = FileSystem.Directory.GetCurrentDirectory();
-        }
+
+        Path = stateManager.CurrentState.FullName;
     }
     private void ClearFeedback() { feedback = null; }
 

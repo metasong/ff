@@ -27,7 +27,7 @@ internal class FilepathSuggestionGenerator : ISuggestionGenerator
         }
 
         var path = Cell.ToString (context.CurrentLine);
-        var last = path.LastIndexOfAny (NavigationBar.DirectorySeparators);
+        var last = path.LastIndexOfAny (NavigationBarPanel.DirectorySeparators);
 
         if (string.IsNullOrWhiteSpace (path) || !Path.IsPathRooted (path))
         {

@@ -43,11 +43,11 @@ internal class Program
                 services.AddSingleton<ILocalizationService, LocalizationService>();
                 services.AddSingleton<IStateManager, StateManager>(p => new StateManager(SystemSwitch.GetState(".")));
                 services.AddSingleton<CurrentFolderPanel>();
-                //services.AddSingleton<INavigator, Navigator>();
+                //services.AddSingleton<NavigationBarPanel>();
                 services.AddSingleton<INavigator, Navigator>();
 
                 services.AddSingleton<FileManagerWindow>();
-                services.AddSingleton<NavigationBar>();
+                services.AddSingleton<NavigationBarPanel>();
                 services.AddSingleton<Spinner>();
                 services.AddSingleton<CommandView>();
                 services.AddSingleton<IPreviewPanel, PreviewPanel>();

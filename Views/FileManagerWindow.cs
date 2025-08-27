@@ -1,4 +1,5 @@
 ﻿using ff.Views.CurrentFolder;
+using ff.Views.NavigationBar;
 using ff.Views.Preview;
 
 namespace ff.Views;
@@ -8,16 +9,22 @@ public class FileManagerWindow : Window
     private readonly IStateManager state;
     private readonly CurrentFolderPanel currentFolderPanelPanel;
     private readonly PreviewPanel previewPane;
+    private readonly NavigationBarPanel navigationBar;
     private readonly Spinner spinnerView;
 
-    public FileManagerWindow(IStateManager state, CurrentFolderPanel currentFolderPanelPanel, PreviewPanel previewPane, Spinner spinnerView)
+    public FileManagerWindow(IStateManager state, CurrentFolderPanel currentFolderPanelPanel, PreviewPanel previewPane,NavigationBarPanel navigationBar, Spinner spinnerView)
     {
         this.state = state;
         CanFocus = true;
         this.currentFolderPanelPanel = currentFolderPanelPanel;
         currentFolderPanelPanel.Width = Dim.Percent(50);
+        currentFolderPanelPanel.Y = 1;
         this.previewPane = previewPane;
+        this.navigationBar = navigationBar;
+        navigationBar.Width = Dim.Fill();
+        navigationBar.Height = 1;
         previewPane.X = Pos.Percent(50);
+        previewPane.Y = 1;
         previewPane.Width = Dim.Percent(50);
         this.spinnerView = spinnerView;
         InitializeComponents();
@@ -28,6 +35,7 @@ public class FileManagerWindow : Window
     private void InitializeComponents()
     {
         BorderStyle = LineStyle.None;
+        Add(navigationBar);
         Add(currentFolderPanelPanel);
         Add(previewPane);
         Add(spinnerView);
