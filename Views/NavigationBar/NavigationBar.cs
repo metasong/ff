@@ -1,6 +1,4 @@
-﻿using ff.State;
-
-namespace ff.Views.NavigationBar;
+﻿namespace ff.Views.NavigationBar;
 
 internal sealed class NavigationBar(IStateManager state) : View
 {

@@ -20,27 +20,6 @@ public class FileSystemItem: IItem
     public IDataSystem DataSystem => FileSystem.FileDataSystem.Instance;
 
     public string TypeString => FileSystemInfo is IFileInfo fi ? fi.Extension : $"<{DI.Localization.GetString("Directory")}>";
-    public IEnumerable<IItem> GetChildren()
-    {
-        try
-        {
-            if (FileSystemInfo is IDirectoryInfo dir)
-            {
-                var children = dir.GetFileSystemInfos()
-                    .Select(e => new FileSystemItem(e));
-
-                return children;
-            }
-
-            return [];
-        }
-        catch (Exception ex)
-        {
-            var logger = DI.GetLogger < ILogger<FileSystemItem>>();
-            logger.LogError(ex, "Access permissions Exceptions, Dir not exists etc");
-            return [];
-        }
-    }
 
     public IItem? GetParentItem()
     {

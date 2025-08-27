@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using Terminal.Gui.FileServices;
+using IContainer = System.ComponentModel.IContainer;
 
 namespace ff.Search;
 /// <summary>

@@ -2,8 +2,9 @@
 
 public interface INavigator
 {
-    Task GoToAsync(IDirectoryInfo dir);
+    Task GoToAsync(IContainer dir);
     Task BackAsync();
     Task ForwardAsync();
-    Task UpAsync();
+    Task GoToParentAsync();
+    Task SelectItem(IItem item);
 }

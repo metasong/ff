@@ -3,4 +3,7 @@
 public interface ISortableTableSource: ITableSource
 {
     Task Sort(int column, bool asc);
+    IItem GetItem(int row);
+    IDataSystem DataSystem { get; }
+
 }

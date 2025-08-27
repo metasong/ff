@@ -1,8 +1,12 @@
 ﻿namespace ff.State.FileDataSystem;
 
 using System.IO.Abstractions;
+using TerminalFileManager;
+
 public class FileSystemState : FileSystemItem, IContainer
 {
+    private IItem[]? children1;
+
     public static  FileSystemState New(string path, FileSystemItem[]? children = null, CultureInfo? culture = null)
     {
         path = Path.GetFullPath(path);
@@ -27,10 +31,45 @@ public class FileSystemState : FileSystemItem, IContainer
     public FileSystemState(IDirectoryInfo dir, FileSystemItem[]? children = null, CultureInfo? culture = null) : base(dir, culture)
     {
         Directory = dir;
-        Children = children ?? GetChildren().ToArray();//.OfType<FileSystemItem>()
+        children1 = children?.OfType<IItem>().ToArray();
     }
 
-    public IItem[] Children { get; internal set; }
+    private IEnumerable<IItem> GetChildren()
+    {
+        try
+        {
+            if (FileSystemInfo is IDirectoryInfo dir)
+            {
+                var children = dir.GetFileSystemInfos()
+                    .Select(e =>
+                    {
+                        if (e is IDirectoryInfo d)
+                        {
+                            return new FileSystemState(d);
+                        }
+
+                        return new FileSystemItem(e);
+                    });
+
+                return children;
+            }
+
+            return [];
+        }
+        catch (Exception ex)
+        {
+            var logger = DI.GetLogger<ILogger<FileSystemItem>>();
+            logger.LogError(ex, "Access permissions Exceptions, Dir not exists etc");
+            return [];
+        }
+    }
+
+    public IItem[] Children
+    {
+        get => children1??=GetChildren().ToArray();
+        internal set => children1 = value;
+    }
+
     public event Action? ChildrenUpdated;
     public IItem? SelectedChild { get; set; }
     public IDirectoryInfo Directory { get; }

@@ -1,5 +1,4 @@
-﻿using ff.State;
-using ff.Views.CurrentFolder;
+﻿using ff.Views.CurrentFolder;
 using ff.Views.Preview;
 
 namespace ff.Views;
@@ -7,15 +6,19 @@ namespace ff.Views;
 public class FileManagerWindow : Window
 {
     private readonly IStateManager state;
-    private readonly ItemTableView itemTableViewPanel;
+    private readonly CurrentFolderPanel currentFolderPanelPanel;
     private readonly PreviewPanel previewPane;
     private readonly Spinner spinnerView;
 
-    public FileManagerWindow(IStateManager state, ItemTableView itemTableViewPanel, PreviewPanel previewPane, Spinner spinnerView)
+    public FileManagerWindow(IStateManager state, CurrentFolderPanel currentFolderPanelPanel, PreviewPanel previewPane, Spinner spinnerView)
     {
         this.state = state;
-        this.itemTableViewPanel = itemTableViewPanel;
+        CanFocus = true;
+        this.currentFolderPanelPanel = currentFolderPanelPanel;
+        currentFolderPanelPanel.Width = Dim.Percent(50);
         this.previewPane = previewPane;
+        previewPane.X = Pos.Percent(50);
+        previewPane.Width = Dim.Percent(50);
         this.spinnerView = spinnerView;
         InitializeComponents();
         SetupKeyBindings();
@@ -25,12 +28,13 @@ public class FileManagerWindow : Window
     private void InitializeComponents()
     {
         BorderStyle = LineStyle.None;
-        Add(itemTableViewPanel);
-        //Add(previewPane);
+        Add(currentFolderPanelPanel);
+        Add(previewPane);
         Add(spinnerView);
-        var statusBar = new StatusBar(new Shortcut[] { new(Application.QuitKey, "Quit", Quit) });
+        //var statusBar = new StatusBar(new Shortcut[] { new(Application.QuitKey, "Quit", Quit) });
 
-        Add(statusBar);
+        //Add(statusBar);
+
     }
 
     private void SetupKeyBindings()
@@ -43,7 +47,7 @@ public class FileManagerWindow : Window
         });
 
         // Custom key bindings
-        KeyBindings.Add(Key.Q, Command.Quit);
+        Application.KeyBindings.Add(Key.Q.WithAlt, this,Command.Quit);
 
     }
 

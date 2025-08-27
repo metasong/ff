@@ -1,6 +1,4 @@
-﻿using ff.State;
-
-namespace ff.Views.NavigationBar;
+﻿namespace ff.Views.NavigationBar;
 
 /// <summary>
 /// the subview when user want to see/modify the path of current folder, without the selected item part.

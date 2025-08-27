@@ -1,6 +1,4 @@
-﻿using ff.State;
-
-namespace ff.Search.Filter;
+﻿namespace ff.Search.Filter;
 
 internal partial class Filters
 {

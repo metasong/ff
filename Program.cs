@@ -1,7 +1,6 @@
 ﻿using ff;
 using ff.Localization;
 using ff.Navigator;
-using ff.State;
 using ff.Views;
 using ff.Views.Bottom;
 using ff.Views.CurrentFolder;
@@ -43,14 +42,16 @@ internal class Program
             {
                 services.AddSingleton<ILocalizationService, LocalizationService>();
                 services.AddSingleton<IStateManager, StateManager>(p => new StateManager(SystemSwitch.GetState(".")));
-                services.AddSingleton<ItemTableView>();
+                services.AddSingleton<CurrentFolderPanel>();
+                //services.AddSingleton<INavigator, Navigator>();
+                services.AddSingleton<INavigator, Navigator>();
+
                 services.AddSingleton<FileManagerWindow>();
                 services.AddSingleton<NavigationBar>();
                 services.AddSingleton<Spinner>();
                 services.AddSingleton<CommandView>();
-                services.AddSingleton<INavigator, Navigator>();
-                services.AddSingleton<PreviewPanel>();
-
+                services.AddSingleton<IPreviewPanel, PreviewPanel>();
+                services.AddSingleton< PreviewPanel>(p =>(p.GetService<IPreviewPanel>() as PreviewPanel)!);
                 services.Configure<AppConfig>(context.Configuration.GetSection("FileManager"));
             })
             .Build();

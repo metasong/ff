@@ -9,11 +9,13 @@ internal class CurrentFolderTableSource(
     bool sortIsAsc = true)
     : ISortableTableSource
 {
-    FileSystemIconProvider IconProvider { get; set; } = new();
+    FileSystemIconProvider IconProvider { get; set; } = new(){UseNerdIcons = true};
+    public IDataSystem DataSystem => FileSystem.FileDataSystem.Instance;
 
     public object this[int row, int col] => GetColumnValue(col, (FileSystemItem)state.Children[row]);
     public int Rows => state.Children.Count();
     public int Columns => 3;
+    public IItem GetItem(int row) => state.Children[row];
 
     public string[] ColumnNames =>
     [
@@ -37,7 +39,7 @@ internal class CurrentFolderTableSource(
     {
         // This portion on top (folders)
         var forcedOrder = state.Children
-            .OrderByDescending(f => f.IsLeaf ? 100 : -1);
+            .OrderBy(f => f.IsLeaf ? 100 : -1);
 
         var ordered =
             asc

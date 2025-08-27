@@ -1,26 +1,39 @@
-﻿using ff.State;
+﻿using ff.Views.Preview;
 
 namespace ff.Navigator;
 
-public class Navigator(IStateManager stateManager): INavigator
+public class Navigator(IStateManager stateManager, IPreviewPanel previewPanel): INavigator
 {
-    public Task GoToAsync(IDirectoryInfo dir)
+    public Task GoToAsync(IContainer dir)
     {
-        throw new NotImplementedException();
+        stateManager.Push(dir);
+        return Task.CompletedTask;
     }
 
     public Task BackAsync()
     {
-        throw new NotImplementedException();
+        stateManager.Back();
+        return Task.CompletedTask;
+
     }
 
     public Task ForwardAsync()
     {
-        throw new NotImplementedException();
+        stateManager.Forward();
+        return Task.CompletedTask;
+
     }
 
-    public Task UpAsync()
+    public Task GoToParentAsync()
     {
-        throw new NotImplementedException();
+        stateManager.Up();
+        return Task.CompletedTask;
+
+    }
+
+    public Task SelectItem(IItem item)
+    {
+        previewPanel.Preview(item);
+        return Task.CompletedTask;
     }
 }
