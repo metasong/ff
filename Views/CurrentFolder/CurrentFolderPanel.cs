@@ -1,16 +1,14 @@
 ﻿using ff.Navigator;
+using System.Drawing;
+using Terminal.Gui.Views;
 
 namespace ff.Views.CurrentFolder;
 
 public sealed class CurrentFolderPanel : View
 {
-    private int _currentSortColumn;
-    private bool _currentSortIsAsc = true;
-
     private readonly IStateManager stateManager;
     private readonly INavigator navigator;
     private readonly ILogger<CurrentFolderPanel> logger;
-
     private readonly ItemTable itemListTable = new(true);
 
     public CurrentFolderPanel(IStateManager stateManager, INavigator navigator, ILogger<CurrentFolderPanel> logger)
@@ -27,19 +25,21 @@ public sealed class CurrentFolderPanel : View
         this.navigator = navigator;
         this.logger = logger;
         Add(itemListTable);
-
         itemListTable.SetFocus();
         itemListTable.KeyDownHandler = ProcessKeyDown;
         itemListTable.SelectedCellChanged += SelectionChanged;
+        itemListTable.CellActivated += ItemListTable_CellActivated;
 
         this.stateManager.StateChanged += (oldState, newState) => {ShowData(newState); };
         ShowData(stateManager.CurrentState);
         logger.LogInformation("ItemTableView initial");
+
+
     }
 
     private void ShowData(IContainer state)
     {
-        itemListTable.ShowData(state, _currentSortColumn, _currentSortIsAsc);
+        itemListTable.ShowData(state);
         PreviewItem(itemListTable.SelectedRow);
     }
 
@@ -55,34 +55,18 @@ public sealed class CurrentFolderPanel : View
 
     }
 
+    private void ItemListTable_CellActivated(object? sender, CellActivatedEventArgs e)
+    {
+        var item = itemListTable.TableSource.GetItem(e.Row);
+        Open(item);
+    }
+
     private bool ProcessKeyDown(Key keyNoAlt)
     {
         if (keyNoAlt == Key.CursorRight)
         {
             var item = itemListTable.TableSource.GetItem(itemListTable.SelectedRow);
-            if (item is IContainer container)
-            {
-                navigator.GoToAsync(container);
-                return true;
-            }
-
-            try
-            {
-                var startInfo = new ProcessStartInfo
-                {
-                    FileName = item.FullName,
-                    UseShellExecute = true // Important: allows Windows to use file associations
-                };
-
-                Process.Start(startInfo);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, $"error when start '{item.FullName}'");
-            }
-
-            return false;
+            return Open(item);
         }
         if (keyNoAlt == Key.CursorLeft)
         {
@@ -109,5 +93,30 @@ public sealed class CurrentFolderPanel : View
         return false;
     }
 
+    private bool Open(IItem item)
+    {
+        if (item is IContainer container)
+        {
+            navigator.GoToAsync(container);
+            return true;
+        }
 
+        try
+        {
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = item.FullName,
+                UseShellExecute = true // Important: allows Windows to use file associations
+            };
+
+            Process.Start(startInfo);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"error when start '{item.FullName}'");
+        }
+
+        return false;
+    }
 }

@@ -1,4 +1,5 @@
 ﻿using ff.Views.CurrentFolder;
+using Terminal.Gui.Drawing;
 
 namespace ff.Views.Preview;
 

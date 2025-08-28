@@ -1,6 +1,7 @@
 ﻿using ff.Views.CurrentFolder;
 using ff.Views.NavigationBar;
 using ff.Views.Preview;
+using Terminal.Gui.Views;
 
 namespace ff.Views;
 
@@ -11,22 +12,17 @@ public class FileManagerWindow : Window
     private readonly PreviewPanel previewPane;
     private readonly NavigationBarPanel navigationBar;
     private readonly Spinner spinnerView;
+    private TileView _splitContainer;
 
     public FileManagerWindow(IStateManager state, CurrentFolderPanel currentFolderPanelPanel, PreviewPanel previewPane,NavigationBarPanel navigationBar, Spinner spinnerView)
     {
         this.state = state;
         CanFocus = true;
-        this.currentFolderPanelPanel = currentFolderPanelPanel;
-        currentFolderPanelPanel.Width = Dim.Percent(50);
-        currentFolderPanelPanel.Y = 1;
+        this.spinnerView = spinnerView;
         this.previewPane = previewPane;
         this.navigationBar = navigationBar;
-        navigationBar.Width = Dim.Fill();
-        navigationBar.Height = 1;
-        previewPane.X = Pos.Percent(50);
-        previewPane.Y = 1;
-        previewPane.Width = Dim.Percent(50);
-        this.spinnerView = spinnerView;
+        this.currentFolderPanelPanel = currentFolderPanelPanel;
+
         InitializeComponents();
         SetupKeyBindings();
     }
@@ -34,15 +30,38 @@ public class FileManagerWindow : Window
 
     private void InitializeComponents()
     {
+
+        currentFolderPanelPanel.Width = Dim.Fill();
+        currentFolderPanelPanel.Y = 1;
+
+        navigationBar.Width = Dim.Fill();
+        navigationBar.Height = 1;
+        //previewPane.X = Pos.Percent(50);
+        previewPane.Y = 1;
+        previewPane.Width = Dim.Fill();//Dim.Percent(50);
         BorderStyle = LineStyle.None;
         Add(navigationBar);
-        Add(currentFolderPanelPanel);
-        Add(previewPane);
+        //Add(currentFolderPanelPanel);
+        //Add(previewPane);
         Add(spinnerView);
         //var statusBar = new StatusBar(new Shortcut[] { new(Application.QuitKey, "Quit", Quit) });
 
         //Add(statusBar);
-
+        _splitContainer = new()
+        {
+            X = 0,
+            Y = Pos.Bottom(navigationBar),
+            Width = Dim.Fill(),
+            Height = Dim.Fill() //Dim.Fill(Dim.Func(() => IsInitialized ? _btnOk.Frame.Height : 1))
+        };
+        _splitContainer.Tiles.ElementAt(0).ContentView.Add(currentFolderPanelPanel);
+        _splitContainer.Tiles.ElementAt(1).ContentView.Add(previewPane);
+        Initialized += (s, e) =>
+        {
+            //_splitContainer.SetSplitterPos(0, Pos.Percent(50));
+            //_splitContainer.Tiles.ElementAt(0).ContentView.Visible = true;
+        };
+        Add(_splitContainer);
     }
 
     private void SetupKeyBindings()

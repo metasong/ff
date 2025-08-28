@@ -23,9 +23,9 @@ internal class CurrentFolderTableSource(
         MaybeAddSortArrows (DI.Localization.GetString("SizeColumnName"), 1),
         MaybeAddSortArrows (DI.Localization.GetString("ModifiedColumnName"), 2),
     ];
-    private object GetSortableObject(int col)
+    private object GetSortableObject(IItem item, int col)
     {
-        var fileItem = (FileSystemItem)state;
+        var fileItem = (FileSystemItem)item;
         return col switch
         {
             0 => fileItem.Name,
@@ -37,6 +37,8 @@ internal class CurrentFolderTableSource(
 
     public Task Sort(int column, bool asc)
     {
+        sortColumn = column;
+        sortIsAsc = asc;
         // This portion on top (folders)
         var forcedOrder = state.Children
             .OrderBy(f => f.IsLeaf ? 100 : -1);
@@ -45,11 +47,11 @@ internal class CurrentFolderTableSource(
             asc
                 ? forcedOrder.ThenBy(
                     f =>
-                        GetSortableObject(column)
+                        GetSortableObject(f, sortColumn)
                 )
                 : forcedOrder.ThenByDescending(
                     f =>
-                        GetSortableObject(column)
+                        GetSortableObject(f, sortColumn)
                 );
 
         state.Children = ordered.ToArray();

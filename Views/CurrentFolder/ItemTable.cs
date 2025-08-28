@@ -1,4 +1,6 @@
-﻿using Terminal.Gui.FileServices;
+﻿using Microsoft.VisualBasic;
+using System.Drawing;
+using Terminal.Gui.FileServices;
 using Terminal.Gui.Views;
 
 namespace ff.Views.CurrentFolder;
@@ -7,6 +9,9 @@ public record ShortcutConfig(string command, string condition = "");
 
 public class ItemTable : TableView
 {
+    private int _currentSortColumn;
+    private bool _currentSortIsAsc = true;
+
     public FileSystemColorProvider ColorProvider { get; set; } = new();
     private Scheme OldScheme;
 
@@ -72,7 +77,7 @@ public class ItemTable : TableView
 
     protected override bool OnKeyDown(Key key)
     {
-        if (KeyDownHandler?.Invoke(key)??false)
+        if (KeyDownHandler?.Invoke(key) ?? false)
         {
             return true;
         }
@@ -80,14 +85,37 @@ public class ItemTable : TableView
         return base.OnKeyDown(key);
     }
 
-    public void ShowData(IContainer container, int sortColumn = 0, bool isSortAsc = true)
+    protected override bool OnMouseClick(MouseEventArgs e)
     {
-        Table = container.DataSystem.GetTableSource(container, sortColumn, isSortAsc);
-        ApplySort(container, sortColumn, isSortAsc);
+        var clickedCell = ScreenToCell(e.Position.X, e.Position.Y, out var clickedHeaderCol);
+        if (e.Flags.HasFlag(MouseFlags.Button1Clicked)) // left click
+        {
+            if (clickedHeaderCol != null)
+            {
+                _currentSortIsAsc = _currentSortColumn != clickedHeaderCol || !_currentSortIsAsc;
+                _currentSortColumn = clickedHeaderCol.Value;
+                ApplySort(_currentSortColumn, _currentSortIsAsc);
+                return true; // stop further process
+            }
+        }
+
+        if (e.Flags.HasFlag(MouseFlags.Button1DoubleClicked)) // left double click
+        {
+
+        }
+
+        return base.OnMouseClick(e);
+    }
+
+
+    public void ShowData(IContainer container)
+    {
+        Table = container.DataSystem.GetTableSource(container, _currentSortColumn, _currentSortIsAsc);
+        ApplySort(_currentSortColumn, _currentSortIsAsc);
 
     }
 
-    internal void ApplySort(IContainer state, int sortColumn, bool isSortAsc)
+    internal void ApplySort( int sortColumn, bool isSortAsc)
     {
         TableSource.Sort(sortColumn, isSortAsc);
         //itemsListTable.RowOffset = 0;
