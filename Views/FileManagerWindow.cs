@@ -30,14 +30,8 @@ public class FileManagerWindow : Window
 
     private void InitializeComponents()
     {
-
-        currentFolderPanelPanel.Width = Dim.Fill();
-        currentFolderPanelPanel.Y = 1;
-
         navigationBar.Width = Dim.Fill();
         navigationBar.Height = 1;
-        //previewPane.X = Pos.Percent(50);
-        previewPane.Y = 1;
         previewPane.Width = Dim.Fill();//Dim.Percent(50);
         BorderStyle = LineStyle.None;
         Add(navigationBar);
@@ -49,20 +43,23 @@ public class FileManagerWindow : Window
         //Add(statusBar);
         _splitContainer = new()
         {
-            X = 0,
             Y = Pos.Bottom(navigationBar),
             Width = Dim.Fill(),
             Height = Dim.Fill() //Dim.Fill(Dim.Func(() => IsInitialized ? _btnOk.Frame.Height : 1))
         };
         _splitContainer.Tiles.ElementAt(0).ContentView.Add(currentFolderPanelPanel);
         _splitContainer.Tiles.ElementAt(1).ContentView.Add(previewPane);
+       
         Initialized += (s, e) =>
         {
             //_splitContainer.SetSplitterPos(0, Pos.Percent(50));
             //_splitContainer.Tiles.ElementAt(0).ContentView.Visible = true;
         };
         Add(_splitContainer);
+        //var a = GetScheme();
+        //this.SetBackgroundColor(Color.Black);
     }
+
 
     private void SetupKeyBindings()
     {
@@ -77,5 +74,9 @@ public class FileManagerWindow : Window
         Application.KeyBindings.Add(Key.Q.WithAlt, this,Command.Quit);
 
     }
+}
 
+public class Spliter: TileView
+{
+    
 }

@@ -28,6 +28,7 @@ public class ItemTable : TableView
         VerticalScrollBar.AutoShow = true;
         HorizontalScrollBar.AutoShow = true;
         Style.AlwaysShowHeaders = true;
+
         Style.ShowHorizontalHeaderOverline = false;
         Style.ShowHorizontalBottomline = false;
         Style.ShowVerticalCellLines = false;
@@ -61,6 +62,7 @@ public class ItemTable : TableView
     }
 
     internal Func<Key, bool>? KeyDownHandler;
+    private bool showHeader;
 
     internal ISortableTableSource TableSource => (ISortableTableSource)Table;
     //private Dictionary<string, ShortcutConfig> ShortcutMaps = new Dictionary<string, ShortcutConfig>
@@ -122,4 +124,25 @@ public class ItemTable : TableView
         //itemsListTable.SelectedRow = 0;
         Update();
     }
+
+    public bool ShowHeader
+    {
+        get => showHeader;
+        set
+        {
+            showHeader = value;
+            if (value)
+            {
+                Style.ShowHeaders = true;
+                Style.ShowHorizontalHeaderUnderline = true;
+            }
+            else
+            {
+                Style.ShowHeaders = false;
+                Style.ShowHorizontalHeaderUnderline = false;
+            }
+            SetNeedsDraw();
+        }
+    }
+
 }

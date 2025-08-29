@@ -6,6 +6,8 @@ using ff.Views.Bottom;
 using ff.Views.CurrentFolder;
 using ff.Views.NavigationBar;
 using ff.Views.Preview;
+using Terminal.Gui.Configuration;
+using Attribute = Terminal.Gui.Drawing.Attribute;
 
 namespace TerminalFileManager;
 
@@ -14,7 +16,7 @@ internal class Program
     static void Main(string[] args)
     {
         Application.Init();
-        Application.Force16Colors = true;
+        //Application.Force16Colors = true;
         try
         {
             var fileManager = BuildApp(args);
