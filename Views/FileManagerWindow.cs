@@ -1,7 +1,6 @@
 ﻿using ff.Views.CurrentFolder;
 using ff.Views.NavigationBar;
 using ff.Views.Preview;
-using Terminal.Gui.Views;
 
 namespace ff.Views;
 
@@ -12,7 +11,7 @@ public class FileManagerWindow : Window
     private readonly PreviewPanel previewPane;
     private readonly NavigationBarPanel navigationBar;
     private readonly Spinner spinnerView;
-    private TileView _splitContainer;
+    private Spliter _splitContainer;
 
     public FileManagerWindow(IStateManager state, CurrentFolderPanel currentFolderPanelPanel, PreviewPanel previewPane,NavigationBarPanel navigationBar, Spinner spinnerView)
     {
@@ -44,13 +43,15 @@ public class FileManagerWindow : Window
         _splitContainer = new()
         {
             Y = Pos.Bottom(navigationBar),
-            Width = Dim.Fill(),
-            Height = Dim.Fill() //Dim.Fill(Dim.Func(() => IsInitialized ? _btnOk.Frame.Height : 1))
         };
-        _splitContainer.Tiles.ElementAt(0).ContentView.Add(currentFolderPanelPanel);
-        _splitContainer.Tiles.ElementAt(1).ContentView.Add(previewPane);
-       
-        Initialized += (s, e) =>
+
+        _splitContainer.AddViews(currentFolderPanelPanel, previewPane);
+        _splitContainer.ShowHideFolderHeader += shown =>
+        {
+            currentFolderPanelPanel.ShowHeader = shown;
+        };
+
+         Initialized += (s, e) =>
         {
             //_splitContainer.SetSplitterPos(0, Pos.Percent(50));
             //_splitContainer.Tiles.ElementAt(0).ContentView.Visible = true;
@@ -74,9 +75,4 @@ public class FileManagerWindow : Window
         Application.KeyBindings.Add(Key.Q.WithAlt, this,Command.Quit);
 
     }
-}
-
-public class Spliter: TileView
-{
-    
 }

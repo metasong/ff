@@ -37,6 +37,12 @@ public sealed class CurrentFolderPanel : View
 
     }
 
+    public bool ShowHeader
+    {
+        get => itemListTable.ShowHeader;
+        set => itemListTable.ShowHeader = value;
+    }
+
     private void ShowData(IContainer state)
     {
         itemListTable.ShowData(state);
