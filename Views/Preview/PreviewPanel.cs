@@ -1,6 +1,5 @@
 ﻿using ff.Views.CurrentFolder;
 using ff.Views.Preview.Config;
-using Terminal.Gui.Drawing;
 
 namespace ff.Views.Preview;
 
@@ -18,6 +17,11 @@ public class PreviewPanel : View, IPreviewPanel
         imageView = new(previewConfig.ImageConfig);
     }
 
+    public bool ShowHeader
+    {
+        get => itemListTable.ShowHeader;
+        set => itemListTable.ShowHeader = value;
+    }
 
     public void Preview(IItem item)
     {

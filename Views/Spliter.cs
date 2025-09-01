@@ -11,6 +11,7 @@ public class Spliter : View
     {
         this.folderHeaderShown = folderHeaderShown;
         this.statusBarShown = statusBarShown;
+        CanFocus = true;
         Width = Dim.Fill();
         Height = Dim.Fill(); //Dim.Fill(Dim.Func(() => IsInitialized ? _btnOk.Frame.Height : 1))
         Add(tileView);

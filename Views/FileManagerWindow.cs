@@ -49,9 +49,14 @@ public class FileManagerWindow : Window
         _splitContainer.ShowHideFolderHeader += shown =>
         {
             currentFolderPanelPanel.ShowHeader = shown;
+            previewPane.ShowHeader = shown;
+        };
+        _splitContainer.ShowHideStatusBar += shown =>
+        {
+            
         };
 
-         Initialized += (s, e) =>
+        Initialized += (s, e) =>
         {
             //_splitContainer.SetSplitterPos(0, Pos.Percent(50));
             //_splitContainer.Tiles.ElementAt(0).ContentView.Visible = true;
