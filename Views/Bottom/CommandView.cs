@@ -1,6 +1,6 @@
 ﻿namespace ff.Views.Bottom;
 
-public class CommandView(Spinner spinnerView)
+public class CommandView(Spinner spinnerView):View
 {
 
 }

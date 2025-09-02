@@ -1,4 +1,5 @@
-﻿using ff.Views.CurrentFolder;
+﻿using ff.Views.Bottom;
+using ff.Views.CurrentFolder;
 using ff.Views.NavigationBar;
 using ff.Views.Preview;
 
@@ -10,36 +11,28 @@ public class FileManagerWindow : Window
     private readonly CurrentFolderPanel currentFolderPanelPanel;
     private readonly PreviewPanel previewPane;
     private readonly NavigationBarPanel navigationBar;
+    private readonly BottomPanel bottomPanel;
     private readonly Spinner spinnerView;
-    private Spliter _splitContainer;
+    private Splitter _splitContainer;
 
-    public FileManagerWindow(IStateManager state, CurrentFolderPanel currentFolderPanelPanel, PreviewPanel previewPane,NavigationBarPanel navigationBar, Spinner spinnerView)
+    public FileManagerWindow(IStateManager state, CurrentFolderPanel currentFolderPanelPanel, PreviewPanel previewPane,NavigationBarPanel navigationBar, BottomPanel bottomPanel, Spinner spinnerView)
     {
         this.state = state;
         CanFocus = true;
         this.spinnerView = spinnerView;
         this.previewPane = previewPane;
         this.navigationBar = navigationBar;
+        this.bottomPanel = bottomPanel;
         this.currentFolderPanelPanel = currentFolderPanelPanel;
-
         InitializeComponents();
         SetupKeyBindings();
     }
-    private void Quit() { Application.RequestStop(); }
 
     private void InitializeComponents()
     {
-        navigationBar.Width = Dim.Fill();
-        navigationBar.Height = 1;
-        previewPane.Width = Dim.Fill();//Dim.Percent(50);
         BorderStyle = LineStyle.None;
-        Add(navigationBar);
-        //Add(currentFolderPanelPanel);
-        //Add(previewPane);
-        Add(spinnerView);
-        //var statusBar = new StatusBar(new Shortcut[] { new(Application.QuitKey, "Quit", Quit) });
-
-        //Add(statusBar);
+        navigationBar.Height = 1;
+        
         _splitContainer = new()
         {
             Y = Pos.Bottom(navigationBar),
@@ -53,17 +46,33 @@ public class FileManagerWindow : Window
         };
         _splitContainer.ShowHideStatusBar += shown =>
         {
-            
+            bottomPanel.Visible = shown;
         };
+
+        _splitContainer.Height = Dim.Fill(
+            Dim.Func(
+                () =>
+                {
+                    if (bottomPanel!.NeedsLayout)
+                    {
+                        throw new LayoutException("DimFunc.Fn aborted because dependent View needs layout.");
+                    }
+
+                    return bottomPanel.Visible ? bottomPanel.Frame.Height : 0;
+                }));
 
         Initialized += (s, e) =>
         {
             //_splitContainer.SetSplitterPos(0, Pos.Percent(50));
             //_splitContainer.Tiles.ElementAt(0).ContentView.Visible = true;
         };
-        Add(_splitContainer);
-        //var a = GetScheme();
-        //this.SetBackgroundColor(Color.Black);
+       
+
+        bottomPanel.Y = Pos.Bottom(_splitContainer);
+
+        Add(navigationBar, _splitContainer, bottomPanel);
+
+        Add(spinnerView);
     }
 
 

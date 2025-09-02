@@ -45,13 +45,14 @@ internal class Program
                 services.AddSingleton<ILocalizationService, LocalizationService>();
                 services.AddSingleton<IStateManager, StateManager>(p => new StateManager(SystemSwitch.GetState(".")));
                 services.AddSingleton<CurrentFolderPanel>();
-                //services.AddSingleton<NavigationBarPanel>();
                 services.AddSingleton<INavigator, Navigator>();
 
                 services.AddSingleton<FileManagerWindow>();
                 services.AddSingleton<NavigationBarPanel>();
                 services.AddSingleton<Spinner>();
                 services.AddSingleton<CommandView>();
+                services.AddSingleton<BottomPanel>();
+                services.AddSingleton<StatusView>();
                 services.AddSingleton<IPreviewPanel, PreviewPanel>();
                 services.AddSingleton< PreviewPanel>(p =>(p.GetService<IPreviewPanel>() as PreviewPanel)!);
                 services.Configure<AppConfig>(context.Configuration.GetSection("FileManager"));
