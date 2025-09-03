@@ -9,7 +9,7 @@ public sealed class CurrentFolderPanel : View
     private readonly IStateManager stateManager;
     private readonly INavigator navigator;
     private readonly ILogger<CurrentFolderPanel> logger;
-    private readonly ItemTable itemListTable = new(true);
+    private readonly ItemTable itemListTable = new(true) { ShowSelectionBox = true };
 
     public CurrentFolderPanel(IStateManager stateManager, INavigator navigator, ILogger<CurrentFolderPanel> logger)
     {
@@ -34,7 +34,6 @@ public sealed class CurrentFolderPanel : View
         ShowData(stateManager.CurrentState);
         logger.LogInformation("ItemTableView initial");
 
-
     }
 
     public bool ShowHeader
@@ -56,14 +55,14 @@ public sealed class CurrentFolderPanel : View
 
     private void PreviewItem(int row)
     {
-        var selectedItem = itemListTable.TableSource.GetItem(row);
+        var selectedItem = itemListTable.TableSource.GetChild(row);
         navigator.SelectItem(selectedItem);
 
     }
 
     private void ItemListTable_CellActivated(object? sender, CellActivatedEventArgs e)
     {
-        var item = itemListTable.TableSource.GetItem(e.Row);
+        var item = itemListTable.TableSource.GetChild(e.Row);
         Open(item);
     }
 
@@ -71,7 +70,7 @@ public sealed class CurrentFolderPanel : View
     {
         if (keyNoAlt == Key.CursorRight)
         {
-            var item = itemListTable.TableSource.GetItem(itemListTable.SelectedRow);
+            var item = itemListTable.TableSource.GetChild(itemListTable.SelectedRow);
             return Open(item);
         }
         if (keyNoAlt == Key.CursorLeft)

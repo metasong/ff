@@ -1,5 +1,7 @@
-﻿using Microsoft.VisualBasic;
+﻿using ff.State.FileDataSystem;
+using Microsoft.VisualBasic;
 using System.Drawing;
+using ff.State.TableSource;
 using Terminal.Gui.FileServices;
 using Terminal.Gui.Views;
 
@@ -12,14 +14,13 @@ public class ItemTable : TableView
     private int _currentSortColumn;
     private bool _currentSortIsAsc = true;
 
-    public FileSystemColorProvider ColorProvider { get; set; } = new();
     private Scheme OldScheme;
 
     public ItemTable(bool canFocus = false)
     {
         Width = Dim.Fill();
         Height = Dim.Fill();
-        MultiSelect = false;
+        MultiSelect = true;
         CanFocus = canFocus;
         //Enabled = canFocus;
         //BorderStyle = LineStyle.Dashed,
@@ -54,15 +55,34 @@ public class ItemTable : TableView
         OldScheme = GetScheme();
         Style.RowColorGetter = args =>
         {
-            var item = TableSource.GetItem(args.RowIndex);
-            var stats = TableSource.DataSystem.GetColor(item, OldScheme);
+            var item = TableSource.GetChild(args.RowIndex);
+            var selected = IsPureSelected(args.RowIndex); // current row is selected or active
+            var active = this.SelectedRow == args.RowIndex; //current is active
+            
+            var stats = item.DataSystem.GetColor(item, OldScheme);
+            if (selected)
+            {
+                if (active) // selected but also active
+                {
+                    stats = stats with { Focus = stats.Focus with { Style = TextStyle.Underline } };
+                }
+                else // selected but not active
+                {
+                    stats = stats with { Focus = stats.Normal with { Style = TextStyle.Underline } };
+                }
+            }
+
             return stats;
         };
 
     }
-
+    // note: IsSelected(0, args.RowIndex) will return selected or active
+    public bool IsPureSelected(int row) =>
+        MultiSelectedRegions.Any(r => r.Rectangle.Bottom > row && r.Rectangle.Top <= row);
     internal Func<Key, bool>? KeyDownHandler;
     private bool showHeader;
+    private bool showSelectionBox;
+    private IContainer? currentContainer;
 
     internal ISortableTableSource TableSource => (ISortableTableSource)Table;
     //private Dictionary<string, ShortcutConfig> ShortcutMaps = new Dictionary<string, ShortcutConfig>
@@ -94,10 +114,14 @@ public class ItemTable : TableView
         {
             if (clickedHeaderCol != null)
             {
-                _currentSortIsAsc = _currentSortColumn != clickedHeaderCol || !_currentSortIsAsc;
-                _currentSortColumn = clickedHeaderCol.Value;
-                ApplySort(_currentSortColumn, _currentSortIsAsc);
-                return true; // stop further process
+                clickedHeaderCol = ShowSelectionBox ? clickedHeaderCol - 1 : clickedHeaderCol;
+                if (clickedHeaderCol >= 0)
+                {
+                    _currentSortIsAsc = _currentSortColumn != clickedHeaderCol || !_currentSortIsAsc;
+                    _currentSortColumn = clickedHeaderCol.Value;
+                    ApplySort(_currentSortColumn, _currentSortIsAsc);
+                    return true; // stop further process
+                }
             }
         }
 
@@ -112,12 +136,25 @@ public class ItemTable : TableView
 
     public void ShowData(IContainer container)
     {
-        Table = container.DataSystem.GetTableSource(container, _currentSortColumn, _currentSortIsAsc);
-        ApplySort(_currentSortColumn, _currentSortIsAsc);
+        currentContainer = container;
+        var source = container.DataSystem.GetTableSource(container, _currentSortColumn, _currentSortIsAsc);
+        if (ShowSelectionBox)
+            source = new SelectableSortableTableSource(this, source){OnlyToggleByCheckbox = true};
+        Table = source;
 
     }
 
-    internal void ApplySort( int sortColumn, bool isSortAsc)
+    public bool ShowSelectionBox
+    {
+        get => showSelectionBox;
+        set
+        {
+            showSelectionBox = value;
+            if(currentContainer!= null) ShowData(currentContainer);
+        }
+    }
+
+    internal void ApplySort(int sortColumn, bool isSortAsc)
     {
         TableSource.Sort(sortColumn, isSortAsc);
         //itemsListTable.RowOffset = 0;

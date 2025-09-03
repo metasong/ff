@@ -7,7 +7,7 @@ public class FileDataSystem() : IDataSystem
     public static IDataSystem Instance = new FileDataSystem();
     public static ColorProvider ColorProvider = new();
 
-    public ITableSource GetTableSource(IContainer container, int sortColumn = 0,
+    public ISortableTableSource GetTableSource(IContainer container, int sortColumn = 0,
         bool sortIsAsc = true)
     {
         if (container is not FileSystemState state)
@@ -18,7 +18,7 @@ public class FileDataSystem() : IDataSystem
         return new CurrentFolderTableSource(state, sortColumn, sortIsAsc);
     }
 
-    public Scheme? GetColor(IItem item, Scheme current)
+    public Scheme GetColor(IItem item, Scheme current)
     {
         if (item is not FileSystemItem state)
         {

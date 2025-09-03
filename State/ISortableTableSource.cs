@@ -2,8 +2,6 @@
 
 public interface ISortableTableSource: ITableSource
 {
+    IItem GetChild(int row);
     Task Sort(int column, bool asc);
-    IItem GetItem(int row);
-    IDataSystem DataSystem { get; }
-
 }

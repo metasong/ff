@@ -38,6 +38,7 @@ public class PreviewPanel : View, IPreviewPanel
         {
             SwitchToSubview(imageView);
             imageView.ShowImage(item.FullName);
+            return;
         }
     }
 

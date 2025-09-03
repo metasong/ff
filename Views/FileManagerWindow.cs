@@ -2,6 +2,7 @@
 using ff.Views.CurrentFolder;
 using ff.Views.NavigationBar;
 using ff.Views.Preview;
+using Terminal.Gui.Configuration;
 
 namespace ff.Views;
 
@@ -51,7 +52,7 @@ public class FileManagerWindow : Window
 
         _splitContainer.Height = Dim.Fill(
             Dim.Func(
-                () =>
+                _ =>
                 {
                     if (bottomPanel!.NeedsLayout)
                     {
@@ -73,6 +74,10 @@ public class FileManagerWindow : Window
         Add(navigationBar, _splitContainer, bottomPanel);
 
         Add(spinnerView);
+        var theme = ThemeManager.Theme;
+        var t = ThemeManager.GetCurrentTheme();
+        var dd = ThemeManager.GetCurrentThemeName();
+        var e = t["Schemes"];
     }
 
 

@@ -3,19 +3,27 @@ using TerminalFileManager;
 
 namespace ff.State.FileDataSystem;
 
-internal class CurrentFolderTableSource(
-    FileSystemState state,
-    int sortColumn = 0,
-    bool sortIsAsc = true)
-    : ISortableTableSource
+internal class CurrentFolderTableSource : ISortableTableSource
 {
+    private readonly FileSystemState state;
+    private int sortColumn;
+    private bool sortIsAsc;
+
+    public CurrentFolderTableSource(FileSystemState state, int sortColumn = 0,
+    bool sortIsAsc = true)
+    {
+        this.state = state;
+        this.sortColumn = sortColumn;
+        this.sortIsAsc = sortIsAsc;
+        Sort(sortColumn, sortIsAsc);
+    }
+
     FileSystemIconProvider IconProvider { get; set; } = new(){UseNerdIcons = true};
-    public IDataSystem DataSystem => FileSystem.FileDataSystem.Instance;
 
     public object this[int row, int col] => GetColumnValue(col, (FileSystemItem)state.Children[row]);
     public int Rows => state.Children.Count();
     public int Columns => 3;
-    public IItem GetItem(int row) => state.Children[row];
+    public IItem GetChild(int row) => state.Children[row];
 
     public string[] ColumnNames =>
     [
