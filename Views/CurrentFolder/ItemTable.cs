@@ -9,6 +9,12 @@ namespace ff.Views.CurrentFolder;
 
 public record ShortcutConfig(string command, string condition = "");
 
+public static class ExtTableView
+{
+    public static bool IsPureSelected(this TableView tableView, int row) =>
+        tableView.MultiSelectedRegions.Any(r => r.Rectangle.Bottom > row && r.Rectangle.Top <= row);
+}
+
 public class ItemTable : TableView
 {
     private int _currentSortColumn;
@@ -56,9 +62,9 @@ public class ItemTable : TableView
         Style.RowColorGetter = args =>
         {
             var item = TableSource.GetChild(args.RowIndex);
-            var selected = IsPureSelected(args.RowIndex); // current row is selected or active
+            var selected = this.IsPureSelected(args.RowIndex); // current row is selected or active
             var active = this.SelectedRow == args.RowIndex; //current is active
-            
+
             var stats = item.DataSystem.GetColor(item, OldScheme);
             if (selected)
             {
@@ -77,8 +83,7 @@ public class ItemTable : TableView
 
     }
     // note: IsSelected(0, args.RowIndex) will return selected or active
-    public bool IsPureSelected(int row) =>
-        MultiSelectedRegions.Any(r => r.Rectangle.Bottom > row && r.Rectangle.Top <= row);
+
     internal Func<Key, bool>? KeyDownHandler;
     private bool showHeader;
     private bool showSelectionBox;
@@ -139,7 +144,7 @@ public class ItemTable : TableView
         currentContainer = container;
         var source = container.DataSystem.GetTableSource(container, _currentSortColumn, _currentSortIsAsc);
         if (ShowSelectionBox)
-            source = new SelectableSortableTableSource(this, source){OnlyToggleByCheckbox = true};
+            source = new SelectableSortableTableSource(this, source) { OnlyToggleByCheckbox = true };
         Table = source;
 
     }
@@ -150,7 +155,7 @@ public class ItemTable : TableView
         set
         {
             showSelectionBox = value;
-            if(currentContainer!= null) ShowData(currentContainer);
+            if (currentContainer != null) ShowData(currentContainer);
         }
     }
 

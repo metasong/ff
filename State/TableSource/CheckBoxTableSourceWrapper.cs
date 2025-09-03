@@ -1,4 +1,5 @@
 ﻿
+using ff.Views.CurrentFolder;
 using System.Drawing;
 
 namespace ff.State.TableSource;
@@ -11,7 +12,7 @@ namespace ff.State.TableSource;
 ///     This class wraps another <see cref="ITableSource"/> and dynamically serves its rows/cols plus an extra column.
 ///     Data in the wrapped source can be dynamic (change over time).
 /// </remarks>
-public abstract class CheckBoxTableSourceWrapperBase : ITableSource
+public class CheckBoxTableSourceWrapper : ITableSource
 {
     private readonly TableView tableView;
 
@@ -24,7 +25,7 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
     ///     registration.
     /// </param>
     /// <param name="toWrap">The original data source of the <see cref="TableView"/> that you want to add checkboxes to.</param>
-    public CheckBoxTableSourceWrapperBase(TableView tableView, ITableSource toWrap)
+    public CheckBoxTableSourceWrapper(TableView tableView, ITableSource toWrap)
     {
         Wrapping = toWrap;
         this.tableView = tableView;
@@ -113,29 +114,29 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
     }
 
     /// <summary>Clears the toggled state of all rows.</summary>
-    protected abstract void ClearAllToggles();
+    protected virtual void ClearAllToggles() { }
 
     /// <summary>Returns true if <paramref name="row"/> is checked.</summary>
     /// <param name="row"></param>
     /// <returns></returns>
-    protected abstract bool IsChecked(int row);
+    protected virtual bool IsChecked(int row) => tableView.IsPureSelected(row);
 
     /// <summary>
     ///     Called when the 'toggled all' action is performed. This should change state from 'some selected' to 'all
     ///     selected' or clear selection if all area already selected.
     /// </summary>
-    protected abstract void ToggleAllRows();
+    protected virtual void ToggleAllRows() { }
 
     /// <summary>Flips the checked state of the given <paramref name="row"/>/</summary>
     /// <param name="row"></param>
-    protected abstract void ToggleRow(int row);
+    protected virtual void ToggleRow(int row) { }
 
     /// <summary>
     ///     Flips the checked state for a collection of rows. If some (but not all) are selected they should flip to all
     ///     selected.
     /// </summary>
     /// <param name="range"></param>
-    protected abstract void ToggleRows(int[] range);
+    protected virtual void ToggleRows(int[] range) { }
     public bool OnlyToggleByCheckbox { get; set; }
 
     private void TableView_CellToggled(object sender, CellToggledEventArgs e)
