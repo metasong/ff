@@ -1,5 +1,4 @@
 ﻿using ff.Views.Bottom;
-using ff.Views.CurrentFolder;
 using ff.Views.NavigationBar;
 using ff.Views.Preview;
 using Terminal.Gui.Configuration;

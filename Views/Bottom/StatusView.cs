@@ -7,9 +7,9 @@ public class StatusView : StatusBar
         Width = Dim.Fill();
         AlignmentModes = AlignmentModes.IgnoreFirstOrLast;
         Height = Dim.Auto(
-            DimAutoStyle.Auto,
             minimumContentDim: Dim.Func(_ => Visible ? 1 : 0),
-            maximumContentDim: Dim.Func(_ => Visible ? 1 : 0));
+            maximumContentDim: Dim.Func(_ => Visible ? 1 : 0)
+            );
         CanFocus = false;
         // statusBar = new(new Shortcut[] { new(Application.QuitKey, "Quit", () => Application.RequestStop()) });
     }

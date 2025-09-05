@@ -10,7 +10,7 @@ public class FileDataSystem() : IDataSystem
     public ISortableTableSource GetTableSource(IContainer container, int sortColumn = 0,
         bool sortIsAsc = true)
     {
-        if (container is not FileSystemState state)
+        if (container is not FileSystemContainer state)
         {
             throw new ArgumentException($"the container must be a FileSystemState!");
         }

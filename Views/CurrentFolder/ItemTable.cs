@@ -1,9 +1,4 @@
-﻿using ff.State.FileDataSystem;
-using Microsoft.VisualBasic;
-using System.Drawing;
-using ff.State.TableSource;
-using Terminal.Gui.FileServices;
-using Terminal.Gui.Views;
+﻿using ff.State.TableSource;
 
 namespace ff.Views.CurrentFolder;
 
@@ -103,8 +98,7 @@ public class ItemTable : TableView
     //};
 
     protected override bool OnKeyDown(Key key)
-    {
-        if (KeyDownHandler?.Invoke(key) ?? false)
+    { if (KeyDownHandler?.Invoke(key) ?? false)
         {
             return true;
         }
@@ -142,11 +136,50 @@ public class ItemTable : TableView
     public void ShowData(IContainer container)
     {
         currentContainer = container;
+        TableSource?.Dispose();
         var source = container.DataSystem.GetTableSource(container, _currentSortColumn, _currentSortIsAsc);
         if (ShowSelectionBox)
-            source = new SelectableSortableTableSource(this, source) { OnlyToggleByCheckbox = true };
+            source = new SelectableSortableTableSource(this, source);
         Table = source;
 
+    }
+
+    //public void SelectRowInToggleState()
+    public void SelectAllInToggleableState(bool toggle = true)
+    {
+        if (!toggle)
+        {
+            base.SelectAll();
+            return;
+        }
+
+        if (!MultiSelect || Table.Rows == 0)
+        {
+            return;
+        }
+
+        MultiSelectedRegions.Clear();
+
+        // Create a single region over entire table, set the origin of the selection to the active cell so that a followup spread selection e.g. shift-right behaves properly
+        MultiSelectedRegions.Push(
+            new(
+                new(SelectedColumn, SelectedRow),
+                new(0, 0, Table.Columns, Table.Rows)
+            ){IsToggled = true}
+        );
+        Update();
+    }
+
+    public void SetSelectionInToggleableState(int row, bool toggle = true)
+    {
+        if (!toggle)
+        {
+            base.SetSelection(0,row,false);
+            return;
+        }
+
+        var newRect = new TableSelection(new(0, row), new(0, row, 1, 1) ){IsToggled = true};
+        MultiSelectedRegions.Push(newRect);
     }
 
     public bool ShowSelectionBox

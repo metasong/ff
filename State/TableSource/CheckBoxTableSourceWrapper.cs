@@ -1,7 +1,4 @@
 ﻿
-using ff.Views.CurrentFolder;
-using System.Drawing;
-
 namespace ff.State.TableSource;
 
 /// <summary>
@@ -14,7 +11,7 @@ namespace ff.State.TableSource;
 /// </remarks>
 public class CheckBoxTableSourceWrapper : ITableSource
 {
-    private readonly TableView tableView;
+    private readonly ItemTable tableView;
 
     /// <summary>
     ///     Creates a new instance of the class presenting the data in <paramref name="toWrap"/> plus an additional
@@ -25,15 +22,23 @@ public class CheckBoxTableSourceWrapper : ITableSource
     ///     registration.
     /// </param>
     /// <param name="toWrap">The original data source of the <see cref="TableView"/> that you want to add checkboxes to.</param>
-    public CheckBoxTableSourceWrapper(TableView tableView, ITableSource toWrap)
+    public CheckBoxTableSourceWrapper(ItemTable tableView, ISortableTableSource toWrap)
     {
         Wrapping = toWrap;
         this.tableView = tableView;
-
         tableView.KeyBindings.ReplaceCommands(Key.Space, Command.Select);
 
         tableView.MouseClick += TableView_MouseClick;
         tableView.CellToggled += TableView_CellToggled;
+
+        for (var i = 0; i < Wrapping.Container.Children.Length; i++)
+        {
+            var item = Wrapping.Container.Children[i];
+            if (item.IsSelected)
+            {
+                tableView.SetSelectionInToggleableState(i);
+            }
+        }
     }
 
     /// <summary>
@@ -62,7 +67,7 @@ public class CheckBoxTableSourceWrapper : ITableSource
     public bool UseRadioButtons { get; set; }
 
     /// <summary>Gets the <see cref="ITableSource"/> that this instance is wrapping.</summary>
-    public ITableSource Wrapping { get; }
+    public ISortableTableSource Wrapping { get; }
 
     /// <inheritdoc/>
     public object this[int row, int col]
@@ -96,17 +101,14 @@ public class CheckBoxTableSourceWrapper : ITableSource
     {
         get
         {
-            List<string> toReturn = Wrapping.ColumnNames.ToList();
+            var toReturn = Wrapping.ColumnNames.ToList();
             if (UseRadioButtons)
             {
                 toReturn.Insert(0, " ");
             }
             else
             {
-                if (seletedAll)
-                    toReturn.Insert(0, $"{CheckedRune}");
-                else
-                    toReturn.Insert(0, $"{UnCheckedRune}");
+                toReturn.Insert(0, seletedAll ? $"{CheckedRune}" : $"{UnCheckedRune}");
             }
 
             return toReturn.ToArray();
@@ -119,7 +121,7 @@ public class CheckBoxTableSourceWrapper : ITableSource
     /// <summary>Returns true if <paramref name="row"/> is checked.</summary>
     /// <param name="row"></param>
     /// <returns></returns>
-    protected virtual bool IsChecked(int row) => tableView.IsPureSelected(row);
+    bool IsChecked(int row) => tableView.IsPureSelected(row);
 
     /// <summary>
     ///     Called when the 'toggled all' action is performed. This should change state from 'some selected' to 'all
@@ -129,7 +131,18 @@ public class CheckBoxTableSourceWrapper : ITableSource
 
     /// <summary>Flips the checked state of the given <paramref name="row"/>/</summary>
     /// <param name="row"></param>
-    protected virtual void ToggleRow(int row) { }
+    protected virtual void ToggleRow(int row)
+    {
+        try
+        {
+            var item = Wrapping.GetChild(row);
+            item.IsSelected = !item.IsSelected;
+        }
+        catch (Exception e)
+        {
+
+        }
+    }
 
     /// <summary>
     ///     Flips the checked state for a collection of rows. If some (but not all) are selected they should flip to all
@@ -137,13 +150,15 @@ public class CheckBoxTableSourceWrapper : ITableSource
     /// </summary>
     /// <param name="range"></param>
     protected virtual void ToggleRows(int[] range) { }
-    public bool OnlyToggleByCheckbox { get; set; }
 
+    /// <summary>
+    /// triggered by mouse click or 'space' bar
+    /// </summary>
     private void TableView_CellToggled(object sender, CellToggledEventArgs e)
     {
         // Suppress default toggle behavior when using checkboxes
         // and instead handle ourselves
-        int[] range = tableView.GetAllSelectedCells().Select(c => c.Y).Distinct().ToArray();
+        var range = tableView.GetAllSelectedCells().Select(c => c.Y).Distinct().ToArray();
 
         if (UseRadioButtons)
         {
@@ -160,16 +175,32 @@ public class CheckBoxTableSourceWrapper : ITableSource
         }
         else
         {
-            if (!OnlyToggleByCheckbox)
                 ToggleRows(range);
         }
 
         // if click first column, we let table to draw its selection visual: e.Cancel = false
         if (e.Col != 0)
         {
-            e.Cancel = true;
+            //e.Cancel = true; // we can not select by click or with 'space' key
+            if (IsCommandTriggerFromMouseClick())
+            {
+                e.Cancel = true;// enable 'space' key
+            }
         }
         tableView.SetNeedsDraw();
+    }
+
+    private bool IsCommandTriggerFromMouseClick()
+    {
+        var stackTrace = new StackTrace();
+        for (var i = 3; i < 12; i++)
+        {
+            var frame = stackTrace.GetFrame(i);
+            if (frame?.GetMethod()?.Name == "RaiseMouseClickEvent")
+                return true; // i = 5
+        }
+
+        return false;
     }
 
     private void TableView_MouseClick(object sender, MouseEventArgs e)
@@ -180,9 +211,9 @@ public class CheckBoxTableSourceWrapper : ITableSource
             return;
         }
 
-        Point? hit = tableView.ScreenToCell(e.Position.X, e.Position.Y, out int? headerIfAny);
+        var hit = tableView.ScreenToCell(e.Position.X, e.Position.Y, out var headerIfAny);
 
-        if (headerIfAny.HasValue && headerIfAny.Value == 0)
+        if (headerIfAny is 0)
         {
             // clicking in header with radio buttons does nothing
             if (UseRadioButtons)
@@ -194,13 +225,13 @@ public class CheckBoxTableSourceWrapper : ITableSource
             // otherwise it ticks all rows
             ToggleAllRows();
             if (seletedAll)
-                tableView.SelectAll();
+                tableView.SelectAllInToggleableState();
             else
                 tableView.MultiSelectedRegions.Clear();
             e.Handled = true;
             tableView.SetNeedsDraw();
         }
-        else if (hit.HasValue && hit.Value.X == 0)
+        else if (hit is { X: 0 })
         {
             if (UseRadioButtons)
             {
@@ -216,4 +247,11 @@ public class CheckBoxTableSourceWrapper : ITableSource
             tableView.SetNeedsDraw();
         }
     }
+
+    public void Dispose()
+    {
+        tableView.MouseClick -= TableView_MouseClick;
+        tableView.CellToggled -= TableView_CellToggled;
+    }
+    
 }

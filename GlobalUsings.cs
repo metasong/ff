@@ -11,6 +11,7 @@ global using System.Linq;
 global using System.Text;
 global using System.Threading.Tasks;
 global using ff.State;
+global using ff.Views.CurrentFolder;
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Hosting;

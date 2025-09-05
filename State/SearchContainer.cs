@@ -2,13 +2,13 @@
 
 namespace ff.State;
 
-internal class SearchState(IDirectoryInfo dir, string searchTerms) : FileSystemState(dir)
+internal class SearchContainer(IDirectoryInfo dir, string searchTerms) : FileSystemContainer(dir)
 {
     public string SearchTerms { get; } = searchTerms;
 
     public override bool Equals(object? obj)
     {
-        if (obj is not SearchState other)
+        if (obj is not SearchContainer other)
         {
             return false;
         }

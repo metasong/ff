@@ -1,5 +1,4 @@
-﻿using ff.Views.CurrentFolder;
-using ff.Views.Preview.Config;
+﻿using ff.Views.Preview.Config;
 
 namespace ff.Views.Preview;
 

@@ -3,11 +3,20 @@
 using System.IO.Abstractions;
 using TerminalFileManager;
 
-public class FileSystemState : FileSystemItem, IContainer
+public class FileSystemContainer(IDirectoryInfo dir, FileSystemItem[]? children = null, CultureInfo? culture = null)
+    : FileSystemItem(dir, culture), IContainer
 {
-    private IItem[]? children1;
+    private IItem[]? children = children?.OfType<IItem>().ToArray();
 
-    public static  FileSystemState New(string path, FileSystemItem[]? children = null, CultureInfo? culture = null)
+    /// <summary>
+    /// return the parent container with the file (path) as active child
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="children"></param>
+    /// <param name="culture"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    public static  FileSystemContainer New(string path, FileSystemItem[]? children = null, CultureInfo? culture = null)
     {
         path = Path.GetFullPath(path);
         if (File.Exists(path))
@@ -15,23 +24,17 @@ public class FileSystemState : FileSystemItem, IContainer
             var dirPath = Path.GetDirectoryName(path)!;
             var fileName = Path.GetFileName(path);
             var dirInfoFactory = new FileSystem().DirectoryInfo;
-            var state = new FileSystemState(dirInfoFactory.New(dirPath), children, culture);
-            state.SelectedChild = state.Children.First(c => c.Name == fileName);
-            return state;
+            var container = new FileSystemContainer(dirInfoFactory.New(dirPath), children, culture);
+            container.ActiveChild = container.Children.First(c => c.Name == fileName);
+            return container;
         }
         else if (System.IO.Directory.Exists(path))
         {
             var dirInfoFactory = new FileSystem().DirectoryInfo;
-            return new FileSystemState(dirInfoFactory.New(path), children, culture);
+            return new FileSystemContainer(dirInfoFactory.New(path), children, culture);
         }
 
         throw new ArgumentException($"Path: '{path}' is not exist.");
-    }
-
-    public FileSystemState(IDirectoryInfo dir, FileSystemItem[]? children = null, CultureInfo? culture = null) : base(dir, culture)
-    {
-        Directory = dir;
-        children1 = children?.OfType<IItem>().ToArray();
     }
 
     private IEnumerable<IItem> GetChildren()
@@ -40,18 +43,18 @@ public class FileSystemState : FileSystemItem, IContainer
         {
             if (FileSystemInfo is IDirectoryInfo dir)
             {
-                var children = dir.GetFileSystemInfos()
+                var items = dir.GetFileSystemInfos()
                     .Select(e =>
                     {
                         if (e is IDirectoryInfo d)
                         {
-                            return new FileSystemState(d);
+                            return new FileSystemContainer(d);
                         }
 
                         return new FileSystemItem(e);
                     });
 
-                return children;
+                return items;
             }
 
             return [];
@@ -66,27 +69,27 @@ public class FileSystemState : FileSystemItem, IContainer
 
     public IItem[] Children
     {
-        get => children1??=GetChildren().ToArray();
-        internal set => children1 = value;
+        get => children??=GetChildren().ToArray();
+        internal set => children = value;
     }
 
     public event Action? ChildrenUpdated;
-    public IItem? SelectedChild { get; set; }
-    public IDirectoryInfo Directory { get; }
+    public IItem? ActiveChild { get; set; }
+    public IDirectoryInfo Directory { get; } = dir;
 
     public IContainer? GetParent()
     {
         var parent = Directory.Parent;
-        return parent == null ? null : new FileSystemState(parent);
+        return parent == null ? null : new FileSystemContainer(parent);
     }
-    protected bool Equals(FileSystemState other)
+    protected bool Equals(FileSystemContainer other)
     {
         return Directory.FullName.Equals(other.Directory.FullName);
     }
 
     public override bool Equals(object? obj)
     {
-        if (obj is not FileSystemState other)
+        if (obj is not FileSystemContainer other)
         {
             return false;
         }

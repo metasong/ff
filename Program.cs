@@ -3,7 +3,6 @@ using ff.Localization;
 using ff.Navigator;
 using ff.Views;
 using ff.Views.Bottom;
-using ff.Views.CurrentFolder;
 using ff.Views.NavigationBar;
 using ff.Views.Preview;
 using Terminal.Gui.Configuration;

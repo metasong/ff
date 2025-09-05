@@ -15,7 +15,7 @@ public static class SystemSwitch
         path = path.Trim();
         if (path.StartsWith("./") || path.StartsWith(@".\") || path == "."|| path[1] == ':' && char.IsAsciiLetter(path[0]))
         {
-            return FileSystemState.New(path);
+            return FileSystemContainer.New(path);
         }
 
         throw new ArgumentException("can not file system from path!");

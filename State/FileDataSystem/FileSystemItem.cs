@@ -18,6 +18,7 @@ public class FileSystemItem: IItem
 
     public bool IsLeaf => !IsDir;
     public IDataSystem DataSystem => FileSystem.FileDataSystem.Instance;
+    public bool IsSelected { get; set; }
 
     public string TypeString => FileSystemInfo is IFileInfo fi ? fi.Extension : $"<{DI.Localization.GetString("Directory")}>";
 

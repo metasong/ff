@@ -9,4 +9,5 @@ public interface IItem
     string FullName { get; } // with parent path
     bool IsLeaf { get; }// container or leaf
     IDataSystem DataSystem { get; }
+    bool IsSelected { get; set; }
 }

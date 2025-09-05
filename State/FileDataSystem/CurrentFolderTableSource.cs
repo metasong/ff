@@ -5,14 +5,14 @@ namespace ff.State.FileDataSystem;
 
 internal class CurrentFolderTableSource : ISortableTableSource
 {
-    private readonly FileSystemState state;
+    readonly FileSystemContainer container;
     private int sortColumn;
     private bool sortIsAsc;
 
-    public CurrentFolderTableSource(FileSystemState state, int sortColumn = 0,
+    public CurrentFolderTableSource(FileSystemContainer container, int sortColumn = 0,
     bool sortIsAsc = true)
     {
-        this.state = state;
+        this.container = container;
         this.sortColumn = sortColumn;
         this.sortIsAsc = sortIsAsc;
         Sort(sortColumn, sortIsAsc);
@@ -20,10 +20,11 @@ internal class CurrentFolderTableSource : ISortableTableSource
 
     FileSystemIconProvider IconProvider { get; set; } = new(){UseNerdIcons = true};
 
-    public object this[int row, int col] => GetColumnValue(col, (FileSystemItem)state.Children[row]);
-    public int Rows => state.Children.Count();
+    public object this[int row, int col] => GetColumnValue(col, (FileSystemItem)container.Children[row]);
+    public int Rows => container.Children.Count();
     public int Columns => 3;
-    public IItem GetChild(int row) => state.Children[row];
+    public IContainer Container => container;
+    public IItem GetChild(int row) => container.Children[row];
 
     public string[] ColumnNames =>
     [
@@ -48,7 +49,7 @@ internal class CurrentFolderTableSource : ISortableTableSource
         sortColumn = column;
         sortIsAsc = asc;
         // This portion on top (folders)
-        var forcedOrder = state.Children
+        var forcedOrder = container.Children
             .OrderBy(f => f.IsLeaf ? 100 : -1);
 
         var ordered =
@@ -62,7 +63,7 @@ internal class CurrentFolderTableSource : ISortableTableSource
                         GetSortableObject(f, sortColumn)
                 );
 
-        state.Children = ordered.ToArray();
+        container.Children = ordered.ToArray();
         return Task.CompletedTask;
     }
 
@@ -92,4 +93,9 @@ internal class CurrentFolderTableSource : ISortableTableSource
         return name;
     }
 
+
+    public void Dispose()
+    {
+       
+    }
 }
