@@ -7,13 +7,19 @@ public class PreviewPanel : View, IPreviewPanel
     private readonly ItemTable itemListTable = new();
     private readonly ImageView imageView;
     private readonly PreviewConfig previewConfig = new PreviewConfig();
-    public PreviewPanel()
+    public PreviewPanel(IStateManager stateManager)
     {
         Width = Dim.Fill();
         Height = Dim.Fill();
         //BorderStyle = LineStyle.Dashed;
         //this.SetBackgroundColor(ColorName16.Blue);
         imageView = new(previewConfig.ImageConfig);
+        stateManager.ActiveItemChanged += Navigator_ActiveItemChanged;
+    }
+
+    private void Navigator_ActiveItemChanged(int old, int newIndex, IItem[] children)
+    {
+        Preview(children[newIndex]);
     }
 
     public bool ShowHeader

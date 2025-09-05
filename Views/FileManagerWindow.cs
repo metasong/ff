@@ -15,7 +15,7 @@ public class FileManagerWindow : Window
     private readonly Spinner spinnerView;
     private Splitter _splitContainer;
 
-    public FileManagerWindow(IStateManager state, CurrentFolderPanel currentFolderPanelPanel, PreviewPanel previewPane,NavigationBarPanel navigationBar, BottomPanel bottomPanel, Spinner spinnerView)
+    public FileManagerWindow(IStateManager state, BottomPanel bottomPanel,PreviewPanel previewPane,CurrentFolderPanel currentFolderPanelPanel, NavigationBarPanel navigationBar,  Spinner spinnerView)
     {
         this.state = state;
         CanFocus = true;

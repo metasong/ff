@@ -1,6 +1,5 @@
 ﻿using ff;
 using ff.Localization;
-using ff.Navigator;
 using ff.Views;
 using ff.Views.Bottom;
 using ff.Views.NavigationBar;
@@ -44,7 +43,7 @@ internal class Program
                 services.AddSingleton<ILocalizationService, LocalizationService>();
                 services.AddSingleton<IStateManager, StateManager>(p => new StateManager(SystemSwitch.GetState(".")));
                 services.AddSingleton<CurrentFolderPanel>();
-                services.AddSingleton<INavigator, Navigator>();
+                //services.AddSingleton<INavigator, Navigator>();
 
                 services.AddSingleton<FileManagerWindow>();
                 services.AddSingleton<NavigationBarPanel>();

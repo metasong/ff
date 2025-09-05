@@ -1,17 +1,12 @@
-﻿using ff.Navigator;
-using System.Drawing;
-using Terminal.Gui.Views;
-
-namespace ff.Views.CurrentFolder;
+﻿namespace ff.Views.CurrentFolder;
 
 public sealed class CurrentFolderPanel : View
 {
     private readonly IStateManager stateManager;
-    private readonly INavigator navigator;
     private readonly ILogger<CurrentFolderPanel> logger;
     private readonly ItemTable itemListTable = new(true) { ShowSelectionBox = true };
 
-    public CurrentFolderPanel(IStateManager stateManager, INavigator navigator, ILogger<CurrentFolderPanel> logger)
+    public CurrentFolderPanel(IStateManager stateManager, ILogger<CurrentFolderPanel> logger)
     {
         Width = Dim.Fill();
         Height = Dim.Fill();
@@ -22,7 +17,6 @@ public sealed class CurrentFolderPanel : View
         //BorderStyle = LineStyle.Dotted;
 
         this.stateManager = stateManager;
-        this.navigator = navigator;
         this.logger = logger;
         Add(itemListTable);
         itemListTable.SetFocus();
@@ -45,18 +39,18 @@ public sealed class CurrentFolderPanel : View
     private void ShowData(IContainer state)
     {
         itemListTable.ShowData(state);
-        PreviewItem(itemListTable.SelectedRow);
+        PreviewItem(-1, itemListTable.SelectedRow);
     }
 
     private void SelectionChanged(object? sender, SelectedCellChangedEventArgs e)
     {
-        PreviewItem(e.NewRow);
+        PreviewItem(e.OldRow, e.NewRow);
     }
 
-    private void PreviewItem(int row)
+    private void PreviewItem(int old, int row)
     {
-        var selectedItem = itemListTable.TableSource.GetChild(row);
-        navigator.SelectItem(selectedItem);
+        //var selectedItem = itemListTable.TableSource.GetChild(row);
+        stateManager.ChangeActiveItem(old,row, itemListTable.TableSource.Container.Children);
 
     }
 
@@ -76,8 +70,14 @@ public sealed class CurrentFolderPanel : View
         if (keyNoAlt == Key.CursorLeft)
         {
 
-            navigator.GoToParentAsync();
+            stateManager.Up();
             return true;
+        }
+
+        if (keyNoAlt == Key.CursorUp)
+        {
+
+            return false; // let base table to do 
         }
 
         if (keyNoAlt.IsAlt)
@@ -85,13 +85,13 @@ public sealed class CurrentFolderPanel : View
             keyNoAlt = keyNoAlt.NoAlt;
             if (keyNoAlt == Key.CursorRight)
             {
-                navigator.ForwardAsync();
+                stateManager.Forward();
                 return true;
             }
 
             if (keyNoAlt == Key.CursorLeft)
             {
-                navigator.BackAsync();
+                stateManager.Back();
                 return true;
             }
         }
@@ -102,7 +102,7 @@ public sealed class CurrentFolderPanel : View
     {
         if (item is IContainer container)
         {
-            navigator.GoToAsync(container);
+           stateManager.Push(container);
             return true;
         }
 

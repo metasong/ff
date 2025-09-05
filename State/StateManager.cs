@@ -86,4 +86,10 @@ internal class StateManager: IStateManager
         CurrentState = container;
         return true;
     }
+    public event Action<int, int, IItem[]>? ActiveItemChanged;
+
+    public void ChangeActiveItem(int oldIndex, int newIndex, IItem[] children)
+    {
+        ActiveItemChanged?.Invoke(oldIndex, newIndex, children);
+    }
 }

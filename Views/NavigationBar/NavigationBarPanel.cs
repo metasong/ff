@@ -1,17 +1,15 @@
-﻿using ff.Navigator;
-
-namespace ff.Views.NavigationBar;
+﻿namespace ff.Views.NavigationBar;
 
 public sealed class NavigationBarPanel : View
 {
-    private readonly INavigator navigator;
+    private readonly IStateManager state;
     private readonly NavigationBarTextView textView;
     private readonly Button _btnUp;
     private readonly Button _btnForward;
     private readonly Button _btnBack;
-    public NavigationBarPanel(IStateManager state, INavigator navigator, ILogger<NavigationBarPanel> logger)
+    public NavigationBarPanel(IStateManager state, ILogger<NavigationBarPanel> logger)
     {
-        this.navigator = navigator;
+        this.state = state;
         Width = Dim.Fill();
         Height = Dim.Fill();
 
@@ -19,7 +17,7 @@ public sealed class NavigationBarPanel : View
         _btnUp.Text = "▲";
         _btnUp.Accepting += (s, e) =>
         {
-            navigator.GoToParentAsync();
+            state.Up();
             e.Handled = true;
         };
 
@@ -27,7 +25,7 @@ public sealed class NavigationBarPanel : View
         _btnBack.Text = Glyphs.LeftArrow + "-";
         _btnBack.Accepting += (s, e) =>
         {
-            navigator.BackAsync();
+            state.Back();
             e.Handled = true;
         };
 
@@ -35,16 +33,31 @@ public sealed class NavigationBarPanel : View
         _btnForward.Text = "-" + Glyphs.RightArrow;
         _btnForward.Accepting += (s, e) =>
         {
-            this.navigator.ForwardAsync();
+            state.Forward();
             e.Handled = true;
         };
 
-        textView = new NavigationBarTextView(state){X = Pos.Right(_btnForward)};
+        state.StateChanged += State_StateChanged;
 
+
+        textView = new NavigationBarTextView(state){X = Pos.Right(_btnForward)};
+        UpdateButtonStatus();
         Add(_btnForward);
         Add(_btnBack);
         Add(_btnUp);
         Add(textView);
+    }
+
+    private void State_StateChanged(IContainer arg1, IContainer arg2)
+    {
+        UpdateButtonStatus();
+    }
+
+    private void UpdateButtonStatus()
+    {
+        _btnUp.Enabled = state.CanUp();
+        _btnBack.Enabled = state.CanBack();
+        _btnForward.Enabled = state.CanForward();
     }
 
     internal static char[] DirectorySeparators =
