@@ -1,10 +1,6 @@
 ﻿using ff;
 using ff.Localization;
 using ff.Views;
-using ff.Views.Bottom;
-using ff.Views.NavigationBar;
-using ff.Views.Preview;
-using Terminal.Gui.Configuration;
 using Attribute = Terminal.Gui.Drawing.Attribute;
 
 namespace TerminalFileManager;

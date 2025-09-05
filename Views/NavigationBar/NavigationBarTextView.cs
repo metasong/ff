@@ -22,7 +22,7 @@ internal sealed class NavigationBarTextView: View
     {       
         this.stateManager = stateManager;
         InitializeComponents();
-        this.stateManager.StateChanged += (oldState, newState) =>
+        this.stateManager.ContainerChanged += (oldState, newState) =>
         {
             tbPath!.Autocomplete.ClearSuggestions();
             Path = newState.FullName;
@@ -31,8 +31,6 @@ internal sealed class NavigationBarTextView: View
                 new AutocompleteFilePathContext(tbPath.Text, tbPath.CursorPosition, newState)
             );
         };
-
-
 
     }
 
@@ -63,7 +61,7 @@ internal sealed class NavigationBarTextView: View
         };
 
 
-        Path = stateManager.CurrentState.FullName;
+        Path = stateManager.CurrentContainer.FullName;
     }
     private void ClearFeedback() { feedback = null; }
 
@@ -105,7 +103,7 @@ internal sealed class NavigationBarTextView: View
         }
 
         tbPath.Autocomplete.GenerateSuggestions(
-            new AutocompleteFilePathContext(tbPath.Text, tbPath.CursorPosition, stateManager.CurrentState)
+            new AutocompleteFilePathContext(tbPath.Text, tbPath.CursorPosition, stateManager.CurrentContainer)
         );
     }
     

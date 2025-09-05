@@ -24,8 +24,8 @@ public sealed class CurrentFolderPanel : View
         itemListTable.SelectedCellChanged += SelectionChanged;
         itemListTable.CellActivated += ItemListTable_CellActivated;
 
-        this.stateManager.StateChanged += (oldState, newState) => {ShowData(newState); };
-        ShowData(stateManager.CurrentState);
+        this.stateManager.ContainerChanged += (oldState, newState) => {ShowData(newState); };
+        ShowData(stateManager.CurrentContainer);
         logger.LogInformation("ItemTableView initial");
 
     }
@@ -102,7 +102,7 @@ public sealed class CurrentFolderPanel : View
     {
         if (item is IContainer container)
         {
-           stateManager.Push(container);
+           stateManager.GoTo(container);
             return true;
         }
 

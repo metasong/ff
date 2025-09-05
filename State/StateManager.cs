@@ -4,25 +4,25 @@ internal class StateManager: IStateManager
 {
     public StateManager(IContainer currentContainer)
     {
-        CurrentState = currentContainer;
+        CurrentContainer = currentContainer;
     }
 
     private readonly Stack<IContainer> backStack = new();
     private readonly Stack<IContainer> forwardStack = new();
     private IContainer currentContainer;
 
-    public IContainer CurrentState
+    public IContainer CurrentContainer
     {
         get => currentContainer;
         private set
         {
             var last = currentContainer;
             currentContainer = value;
-            StateChanged?.Invoke(last, currentContainer);
+            ContainerChanged?.Invoke(last, currentContainer);
         }
     }
 
-    public event Action<IContainer, IContainer>? StateChanged;
+    public event Action<IContainer, IContainer>? ContainerChanged;
 
     public IContainer? LastState
     {
@@ -39,8 +39,8 @@ internal class StateManager: IStateManager
         if (backStack.Count == 0) return false;
 
         var last = backStack.Pop();
-        forwardStack.Push(CurrentState);
-        CurrentState = last;
+        forwardStack.Push(CurrentContainer);
+        CurrentContainer = last;
         return true;
     }
 
@@ -49,9 +49,9 @@ internal class StateManager: IStateManager
     {
         if (forwardStack.Count == 0) return false;
 
-        backStack.Push(CurrentState);
+        backStack.Push(CurrentContainer);
         var current = forwardStack.Pop();
-        CurrentState = current;
+        CurrentContainer = current;
         return true;
     }
 
@@ -63,7 +63,7 @@ internal class StateManager: IStateManager
         if (parent is { })
         {
             backStack.Push(currentContainer);
-            CurrentState = parent;
+            CurrentContainer = parent;
             return true;
         }
 
@@ -73,17 +73,17 @@ internal class StateManager: IStateManager
     public bool CanBack() { return backStack.Count > 0; }
     public bool CanForward() { return  forwardStack.Count > 0; }
 
-    public bool CanUp() => CurrentState.GetParent() != null;
+    public bool CanUp() => CurrentContainer.GetParent() != null;
 
     public void ClearForward() {  forwardStack.Clear(); }
 
-    public bool Push(IContainer container)
+    public bool GoTo(IContainer container)
     {
-        if (CurrentState.Equals(LastState))
+        if (CurrentContainer.Equals(LastState))
             return false;
 
-        backStack.Push(CurrentState);
-        CurrentState = container;
+        backStack.Push(CurrentContainer);
+        CurrentContainer = container;
         return true;
     }
     public event Action<int, int, IItem[]>? ActiveItemChanged;

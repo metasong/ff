@@ -2,10 +2,10 @@
 
 public interface IStateManager
 {
-    public event Action<IContainer, IContainer> StateChanged;
+    public event Action<IContainer, IContainer> ContainerChanged;
     event Action<int, int, IItem[]> ActiveItemChanged;
-    IContainer CurrentState { get; }
-    bool Push(IContainer container);
+    IContainer CurrentContainer { get; }
+    bool GoTo(IContainer container);
     bool CanUp();
     bool CanForward();
     bool CanBack();

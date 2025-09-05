@@ -8,3 +8,12 @@ public interface IContainer: IItem
     IContainer? GetParent();
     new bool IsLeaf => false;
 }
+
+public static class ContainerExt
+{
+    public static IItem[] SelectedItems(this IContainer container)
+    {
+        var items = container.Children.Where(i => i.IsSelected).ToArray();
+        return items;
+    }
+}

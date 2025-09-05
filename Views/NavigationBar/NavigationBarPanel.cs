@@ -4,6 +4,7 @@ public sealed class NavigationBarPanel : View
 {
     private readonly IStateManager state;
     private readonly NavigationBarTextView textView;
+    private readonly Button _btnHome;
     private readonly Button _btnUp;
     private readonly Button _btnForward;
     private readonly Button _btnBack;
@@ -13,7 +14,15 @@ public sealed class NavigationBarPanel : View
         Width = Dim.Fill();
         Height = Dim.Fill();
 
-        _btnUp = new() { X = 0, Y = 0, NoPadding = true };
+        _btnHome = new() { X = 0, Y = 0, NoPadding = true };
+        _btnHome.Text = $"{Glyphs.IdenticalTo}";
+        _btnHome.Accepting += (s, e) =>
+        {
+            
+            e.Handled = true;
+        };
+
+        _btnUp = new() { X = Pos.Right(_btnHome), Y = 0, NoPadding = true };
         _btnUp.Text = "▲";
         _btnUp.Accepting += (s, e) =>
         {
@@ -22,7 +31,7 @@ public sealed class NavigationBarPanel : View
         };
 
         _btnBack = new() { X = Pos.Right(_btnUp), Y = 0, NoPadding = true };
-        _btnBack.Text = Glyphs.LeftArrow + "-";
+        _btnBack.Text = $"{Glyphs.LeftArrow}";// + "-";
         _btnBack.Accepting += (s, e) =>
         {
             state.Back();
@@ -30,25 +39,26 @@ public sealed class NavigationBarPanel : View
         };
 
         _btnForward = new() { X = Pos.Right(_btnBack) , Y = 0, NoPadding = true };
-        _btnForward.Text = "-" + Glyphs.RightArrow;
+        _btnForward.Text = $"{Glyphs.RightArrow}";
         _btnForward.Accepting += (s, e) =>
         {
             state.Forward();
             e.Handled = true;
         };
 
-        state.StateChanged += State_StateChanged;
+        state.ContainerChanged += ContainerContainerChanged;
 
 
         textView = new NavigationBarTextView(state){X = Pos.Right(_btnForward)};
         UpdateButtonStatus();
+        Add(_btnHome);
         Add(_btnForward);
         Add(_btnBack);
         Add(_btnUp);
         Add(textView);
     }
 
-    private void State_StateChanged(IContainer arg1, IContainer arg2)
+    private void ContainerContainerChanged(IContainer arg1, IContainer arg2)
     {
         UpdateButtonStatus();
     }
