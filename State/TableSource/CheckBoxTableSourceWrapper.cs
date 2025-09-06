@@ -1,27 +1,11 @@
 ﻿
 namespace ff.State.TableSource;
 
-/// <summary>
-///     <see cref="ITableSource"/> for a <see cref="TableView"/> which adds a checkbox column as an additional column
-///     in the table.
-/// </summary>
-/// <remarks>
-///     This class wraps another <see cref="ITableSource"/> and dynamically serves its rows/cols plus an extra column.
-///     Data in the wrapped source can be dynamic (change over time).
-/// </remarks>
+
 public class CheckBoxTableSourceWrapper : ITableSource
 {
     private readonly ItemTable tableView;
 
-    /// <summary>
-    ///     Creates a new instance of the class presenting the data in <paramref name="toWrap"/> plus an additional
-    ///     checkbox column.
-    /// </summary>
-    /// <param name="tableView">
-    ///     The <see cref="TableView"/> this source will be used with. This is required for event
-    ///     registration.
-    /// </param>
-    /// <param name="toWrap">The original data source of the <see cref="TableView"/> that you want to add checkboxes to.</param>
     public CheckBoxTableSourceWrapper(ItemTable tableView, ISortableTableSource toWrap)
     {
         Wrapping = toWrap;
@@ -41,35 +25,18 @@ public class CheckBoxTableSourceWrapper : ITableSource
         }
     }
 
-    /// <summary>
-    ///     Gets or sets the character to use for checked entries. Defaults to <see cref="Glyphs.CheckStateChecked"/>
-    /// </summary>
     public Rune CheckedRune { get; set; } = Glyphs.CheckStateChecked;
 
-    /// <summary>
-    ///     Gets or sets the character to use for checked entry when <see cref="UseRadioButtons"/> is true. Defaults to
-    ///     <see cref="Glyphs.Selected"/>
-    /// </summary>
     public Rune RadioCheckedRune { get; set; } = Glyphs.Selected;
 
-    /// <summary>
-    ///     Gets or sets the character to use for unchecked entries when <see cref="UseRadioButtons"/> is true. Defaults
-    ///     to <see cref="Glyphs.UnSelected"/>
-    /// </summary>
     public Rune RadioUnCheckedRune { get; set; } = Glyphs.UnSelected;
 
-    /// <summary>
-    ///     Gets or sets the character to use for UnChecked entries. Defaults to <see cref="Glyphs.CheckStateUnChecked"/>
-    /// </summary>
     public Rune UnCheckedRune { get; set; } = Glyphs.CheckStateUnChecked;
 
-    /// <summary>Gets or sets whether to only allow a single row to be toggled at once (Radio button).</summary>
     public bool UseRadioButtons { get; set; }
 
-    /// <summary>Gets the <see cref="ITableSource"/> that this instance is wrapping.</summary>
     public ISortableTableSource Wrapping { get; }
 
-    /// <inheritdoc/>
     public object this[int row, int col]
     {
         get
@@ -88,15 +55,12 @@ public class CheckBoxTableSourceWrapper : ITableSource
         }
     }
 
-    /// <inheritdoc/>
     public int Rows => Wrapping.Rows;
 
-    /// <inheritdoc/>
     public int Columns => Wrapping.Columns + 1;
 
     private bool seletedAll;
 
-    /// <inheritdoc/>
     public string[] ColumnNames
     {
         get
@@ -144,11 +108,6 @@ public class CheckBoxTableSourceWrapper : ITableSource
         }
     }
 
-    /// <summary>
-    ///     Flips the checked state for a collection of rows. If some (but not all) are selected they should flip to all
-    ///     selected.
-    /// </summary>
-    /// <param name="range"></param>
     protected virtual void ToggleRows(int[] range) { }
 
     /// <summary>
@@ -175,33 +134,13 @@ public class CheckBoxTableSourceWrapper : ITableSource
         }
         else
         {
-                ToggleRows(range);
+            ToggleRows(range);
         }
 
-        // if click first column, we let table to draw its selection visual: e.Cancel = false
-        if (e.Col != 0)
-        {
-            //e.Cancel = true; // we can not select by click or with 'space' key
-            if (IsCommandTriggerFromMouseClick())
-            {
-                e.Cancel = true;// enable 'space' key
-            }
-        }
+
         tableView.SetNeedsDraw();
     }
 
-    private bool IsCommandTriggerFromMouseClick()
-    {
-        var stackTrace = new StackTrace();
-        for (var i = 3; i < 12; i++)
-        {
-            var frame = stackTrace.GetFrame(i);
-            if (frame?.GetMethod()?.Name == "RaiseMouseClickEvent")
-                return true; // i = 5
-        }
-
-        return false;
-    }
 
     private void TableView_MouseClick(object sender, MouseEventArgs e)
     {
@@ -228,6 +167,7 @@ public class CheckBoxTableSourceWrapper : ITableSource
                 tableView.SelectAllInToggleableState();
             else
                 tableView.MultiSelectedRegions.Clear();
+
             e.Handled = true;
             tableView.SetNeedsDraw();
         }
@@ -253,5 +193,5 @@ public class CheckBoxTableSourceWrapper : ITableSource
         tableView.MouseClick -= TableView_MouseClick;
         tableView.CellToggled -= TableView_CellToggled;
     }
-    
+
 }

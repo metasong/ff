@@ -2,49 +2,49 @@
 
 public class FileManagerWindow : Window
 {
-    private readonly IStateManager state;
+    private readonly IStateManager stateManager;
     private readonly CurrentFolderPanel currentFolderPanelPanel;
     private readonly PreviewPanel previewPane;
     private readonly NavigationBarPanel navigationBar;
     private readonly BottomPanel bottomPanel;
     private readonly Spinner spinnerView;
-    private Splitter _splitContainer;
+    private Splitter splitContainer = null!;
 
-    public FileManagerWindow(IStateManager state, BottomPanel bottomPanel,PreviewPanel previewPane,CurrentFolderPanel currentFolderPanelPanel, NavigationBarPanel navigationBar,  Spinner spinnerView)
+    public FileManagerWindow(IStateManager stateManager, BottomPanel bottomPanel,PreviewPanel previewPane, NavigationBarPanel navigationBar, Spinner spinnerView, CurrentFolderPanel currentFolderPanelPanel)
     {
-        this.state = state;
-        CanFocus = true;
+        this.stateManager = stateManager;
         this.spinnerView = spinnerView;
         this.previewPane = previewPane;
         this.navigationBar = navigationBar;
         this.bottomPanel = bottomPanel;
         this.currentFolderPanelPanel = currentFolderPanelPanel;
         InitializeComponents();
-        SetupKeyBindings();
     }
 
     private void InitializeComponents()
     {
+        CanFocus = true;
         BorderStyle = LineStyle.None;
+
         navigationBar.Height = 1;
-        
-        _splitContainer = new()
+
+
+        splitContainer = new()
         {
             Y = Pos.Bottom(navigationBar),
         };
-
-        _splitContainer.AddViews(currentFolderPanelPanel, previewPane);
-        _splitContainer.ShowHideFolderHeader += shown =>
+        splitContainer.AddViews(currentFolderPanelPanel, previewPane);
+        splitContainer.ShowHideFolderHeader += shown =>
         {
             currentFolderPanelPanel.ShowHeader = shown;
             previewPane.ShowHeader = shown;
         };
-        _splitContainer.ShowHideStatusBar += shown =>
+        splitContainer.ShowHideStatusBar += shown =>
         {
             bottomPanel.Visible = shown;
         };
 
-        _splitContainer.Height = Dim.Fill(
+        splitContainer.Height = Dim.Fill(
             Dim.Func(
                 _ =>
                 {
@@ -56,35 +56,33 @@ public class FileManagerWindow : Window
                     return bottomPanel.Visible ? bottomPanel.Frame.Height : 0;
                 }));
 
-        Initialized += (s, e) =>
-        {
-            //_splitContainer.SetSplitterPos(0, Pos.Percent(50));
-            //_splitContainer.Tiles.ElementAt(0).ContentView.Visible = true;
-        };
+        //Initialized += (s, e) =>
+        //{
+        //    //_splitContainer.SetSplitterPos(0, Pos.Percent(50));
+        //    //_splitContainer.Tiles.ElementAt(0).ContentView.Visible = true;
+        //};
        
 
-        bottomPanel.Y = Pos.Bottom(_splitContainer);
+        bottomPanel.Y = Pos.Bottom(splitContainer);
 
-        Add(navigationBar, _splitContainer, bottomPanel);
-
+        Add(navigationBar, splitContainer, bottomPanel);
         Add(spinnerView);
-        var theme = ThemeManager.Theme;
-        var t = ThemeManager.GetCurrentTheme();
-        var dd = ThemeManager.GetCurrentThemeName();
-        var e = t["Schemes"];
-    }
 
+        //var theme = ThemeManager.Theme;
+        //var t = ThemeManager.GetCurrentTheme();
+        //var dd = ThemeManager.GetCurrentThemeName();
+        //var e = t["Schemes"];
+        SetupKeyBindings();
+    }
 
     private void SetupKeyBindings()
     {
-        // Add key bindings using the V2 approach
         AddCommand(Command.Quit, () =>
         {
             Application.RequestStop();
             return true;
         });
 
-        // Custom key bindings
         Application.KeyBindings.Add(Key.Q.WithAlt, this,Command.Quit);
 
     }

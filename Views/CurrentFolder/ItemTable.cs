@@ -1,8 +1,9 @@
 ﻿using ff.State.TableSource;
+using Terminal.Gui.Views;
 
 namespace ff.Views.CurrentFolder;
 
-public record ShortcutConfig(string command, string condition = "");
+public record ShortcutConfig(string Command, string Condition = "");
 
 public static class ExtTableView
 {
@@ -12,10 +13,10 @@ public static class ExtTableView
 
 public class ItemTable : TableView
 {
-    private int _currentSortColumn;
-    private bool _currentSortIsAsc = true;
+    private int currentSortColumn;
+    private bool currentSortIsAsc = true;
 
-    private Scheme OldScheme;
+    private Scheme oldScheme;
 
     public ItemTable(bool canFocus = false)
     {
@@ -53,14 +54,14 @@ public class ItemTable : TableView
         //ColumnStyle dateModifiedStyle = Style.GetOrCreateColumnStyle(2);
         //dateModifiedStyle.MinWidth = 30;
         //dateModifiedStyle.ColorGetter = ColorGetter;
-        OldScheme = GetScheme();
+        oldScheme = GetScheme();
         Style.RowColorGetter = args =>
         {
             var item = TableSource.GetChild(args.RowIndex);
             var selected = this.IsPureSelected(args.RowIndex); // current row is selected or active
             var active = this.SelectedRow == args.RowIndex; //current is active
 
-            var stats = item.DataSystem.GetColor(item, OldScheme);
+            var stats = item.DataSystem.GetColor(item, oldScheme);
             if (selected)
             {
                 if (active) // selected but also active
@@ -76,6 +77,8 @@ public class ItemTable : TableView
             return stats;
         };
 
+        CreateContextMenu();
+
     }
     // note: IsSelected(0, args.RowIndex) will return selected or active
 
@@ -83,6 +86,7 @@ public class ItemTable : TableView
     private bool showHeader;
     private bool showSelectionBox;
     private IContainer? currentContainer;
+    private PopoverMenu contextMenu;
 
     internal ISortableTableSource TableSource => (ISortableTableSource)Table;
     //private Dictionary<string, ShortcutConfig> ShortcutMaps = new Dictionary<string, ShortcutConfig>
@@ -116,9 +120,9 @@ public class ItemTable : TableView
                 clickedHeaderCol = ShowSelectionBox ? clickedHeaderCol - 1 : clickedHeaderCol;
                 if (clickedHeaderCol >= 0)
                 {
-                    _currentSortIsAsc = _currentSortColumn != clickedHeaderCol || !_currentSortIsAsc;
-                    _currentSortColumn = clickedHeaderCol.Value;
-                    ApplySort(_currentSortColumn, _currentSortIsAsc);
+                    currentSortIsAsc = currentSortColumn != clickedHeaderCol || !currentSortIsAsc;
+                    currentSortColumn = clickedHeaderCol.Value;
+                    ApplySort(currentSortColumn, currentSortIsAsc);
                     return true; // stop further process
                 }
             }
@@ -127,17 +131,51 @@ public class ItemTable : TableView
         if (e.Flags.HasFlag(MouseFlags.Button1DoubleClicked)) // left double click
         {
 
+
+        } else if (e.Flags.HasFlag((MouseFlags.Button3Clicked))) // right button click
+        {
+            contextMenu.MakeVisible(e.ScreenPosition);
+            UpdateContextMenu();
         }
+
 
         return base.OnMouseClick(e);
     }
 
+    protected override void OnCellToggled(CellToggledEventArgs args)
+    {
+        // if click first column, we let table to draw its selection visual: e.Cancel = false
+        if (!(ShowSelectionBox && args.Col == 0))
+        {
+            //e.Cancel = true; // we can not select by click or with 'space' key
+            if (IsCommandTriggerFromMouseClick())
+            {
+                args.Cancel = true;// cancel the mouse click, only enable 'space' key
+                return;
+            }
+        }
+
+        base.OnCellToggled(args);
+    }
+
+    private bool IsCommandTriggerFromMouseClick()
+    {
+        var stackTrace = new StackTrace();
+        for (var i = 3; i < 12; i++)
+        {
+            var frame = stackTrace.GetFrame(i);
+            if (frame?.GetMethod()?.Name == "RaiseMouseClickEvent")
+                return true; // i = 5
+        }
+
+        return false;
+    }
 
     public void ShowData(IContainer container)
     {
         currentContainer = container;
         TableSource?.Dispose();
-        var source = container.DataSystem.GetTableSource(container, _currentSortColumn, _currentSortIsAsc);
+        var source = container.DataSystem.GetTableSource(container, currentSortColumn, currentSortIsAsc);
         if (ShowSelectionBox)
             source = new SelectableSortableTableSource(this, source);
         Table = source;
@@ -191,6 +229,39 @@ public class ItemTable : TableView
             if (currentContainer != null) ShowData(currentContainer);
         }
     }
+
+    private void CreateContextMenu()
+    {
+        var showSelection = new MenuItemv2()
+        {
+            Title = "Show Selection Box",
+            //Key = Key.S.WithCtrl,
+            
+            CommandView = new CheckBox() { Title = "Show Selection Box", CanFocus = false,CheckedState = ShowSelectionBox ? CheckState.Checked: CheckState.UnChecked}
+        };
+
+        showSelection.Action = () =>
+        {
+            var checkBox = ((CheckBox)(showSelection!.CommandView));
+            var check = checkBox.CheckedState == CheckState.Checked;
+            ShowSelectionBox = check;
+        };
+        contextMenu = new PopoverMenu([
+            showSelection
+        ])
+        {
+           
+        };
+        
+    }
+
+    private void UpdateContextMenu()
+    {
+        var menuItems = contextMenu.Root.SubViews.Cast<MenuItemv2>().ToArray();
+        var showSelectionCheckbox = (CheckBox)(menuItems[0].CommandView);
+        showSelectionCheckbox. CheckedState = ShowSelectionBox ? CheckState.Checked : CheckState.UnChecked;
+    }
+
 
     internal void ApplySort(int sortColumn, bool isSortAsc)
     {
