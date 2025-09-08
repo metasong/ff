@@ -11,12 +11,16 @@ public static class ExtTableView
         tableView.MultiSelectedRegions.Any(r => r.Rectangle.Bottom > row && r.Rectangle.Top <= row);
 }
 
-public class ItemTable : TableView
+public class ItemTable : TableView, IPreviewer
 {
     private int currentSortColumn;
     private bool currentSortIsAsc = true;
 
-    private Scheme oldScheme;
+    private readonly Scheme oldScheme;
+    private bool showHeader;
+    private bool showSelectionBox;
+    private IContainer? currentContainer;
+    private PopoverMenu contextMenu = null!;
 
     public ItemTable(bool canFocus = false)
     {
@@ -55,38 +59,38 @@ public class ItemTable : TableView
         //dateModifiedStyle.MinWidth = 30;
         //dateModifiedStyle.ColorGetter = ColorGetter;
         oldScheme = GetScheme();
-        Style.RowColorGetter = args =>
-        {
-            var item = TableSource.GetChild(args.RowIndex);
-            var selected = this.IsPureSelected(args.RowIndex); // current row is selected or active
-            var active = this.SelectedRow == args.RowIndex; //current is active
 
-            var stats = item.DataSystem.GetColor(item, oldScheme);
-            if (selected)
-            {
-                if (active) // selected but also active
-                {
-                    stats = stats with { Focus = stats.Focus with { Style = TextStyle.Underline } };
-                }
-                else // selected but not active
-                {
-                    stats = stats with { Focus = stats.Normal with { Style = TextStyle.Underline } };
-                }
-            }
-
-            return stats;
-        };
+        Style.RowColorGetter = RowColorGetter;
 
         CreateContextMenu();
 
     }
-    // note: IsSelected(0, args.RowIndex) will return selected or active
 
-    internal Func<Key, bool>? KeyDownHandler;
-    private bool showHeader;
-    private bool showSelectionBox;
-    private IContainer? currentContainer;
-    private PopoverMenu contextMenu;
+    private Scheme RowColorGetter(RowColorGetterArgs args)
+    {
+        var item = TableSource.GetChild(args.RowIndex);
+        // note: IsSelected(0, args.RowIndex) will return selected or active
+        var selected = this.IsPureSelected(args.RowIndex); // current row is pure selected
+        var active = SelectedRow == args.RowIndex; //current is active
+
+        var scheme = item.DataSystem.GetColor(item, oldScheme);
+        if (selected)
+        {
+            if (active) // selected but also active
+            {
+                scheme = scheme with { Focus = scheme.Focus with { Style = TextStyle.Underline } };
+            }
+            else // selected but not active
+            {
+                scheme = scheme with { Focus = scheme.Normal with { Style = TextStyle.Underline } };
+            }
+        }
+
+        return scheme;
+    }
+
+    public event Func<Key, bool>? KeyDownHandler;
+
 
     internal ISortableTableSource TableSource => (ISortableTableSource)Table;
     //private Dictionary<string, ShortcutConfig> ShortcutMaps = new Dictionary<string, ShortcutConfig>
@@ -171,23 +175,24 @@ public class ItemTable : TableView
         return false;
     }
 
-    public void ShowData(IContainer container)
+    public bool CanView(IItem item) => item is IContainer;
+
+    public void View(IItem container)
     {
-        currentContainer = container;
+        currentContainer = (IContainer)container;
         TableSource?.Dispose();
-        var source = container.DataSystem.GetTableSource(container, currentSortColumn, currentSortIsAsc);
+        var source = container.DataSystem.GetTableSource(currentContainer, currentSortColumn, currentSortIsAsc);
         if (ShowSelectionBox)
             source = new SelectableSortableTableSource(this, source);
         Table = source;
 
     }
 
-    //public void SelectRowInToggleState()
     public void SelectAllInToggleableState(bool toggle = true)
     {
         if (!toggle)
         {
-            base.SelectAll();
+            SelectAll();
             return;
         }
 
@@ -212,7 +217,7 @@ public class ItemTable : TableView
     {
         if (!toggle)
         {
-            base.SetSelection(0,row,false);
+            SetSelection(0,row,false);
             return;
         }
 
@@ -226,7 +231,7 @@ public class ItemTable : TableView
         set
         {
             showSelectionBox = value;
-            if (currentContainer != null) ShowData(currentContainer);
+            if (currentContainer != null) View(currentContainer);
         }
     }
 
@@ -248,10 +253,7 @@ public class ItemTable : TableView
         };
         contextMenu = new PopoverMenu([
             showSelection
-        ])
-        {
-           
-        };
+        ]);
         
     }
 
@@ -268,7 +270,7 @@ public class ItemTable : TableView
         TableSource.Sort(sortColumn, isSortAsc);
         //itemsListTable.RowOffset = 0;
         //itemsListTable.SelectedRow = 0;
-        Update();
+        SetNeedsDraw();
     }
 
     public bool ShowHeader

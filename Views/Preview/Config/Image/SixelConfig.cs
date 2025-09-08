@@ -1,4 +1,4 @@
-﻿namespace ff.Views.Preview.Config;
+﻿namespace ff.Views.Preview.Config.Image;
 public enum PaletteType { Popularity, MedianCut }
 public enum ColorDistanceAlgorithm { Euclidian, CIE76 }
 public class SixelConfig

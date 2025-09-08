@@ -17,6 +17,10 @@ internal class Program
             Application.Run(fileManager);
             fileManager.Dispose();
         }
+        catch (Exception ex)
+        {
+            MessageBox.ErrorQuery("error", ex.ToString());
+        }
         finally
         {
             Application.Shutdown();

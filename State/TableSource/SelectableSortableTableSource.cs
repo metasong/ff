@@ -5,14 +5,7 @@ internal class SelectableSortableTableSource(ItemTable tableView, ISortableTable
 {
     public IContainer Container => toWrap.Container;
 
-    public IItem GetChild(int row)
-    {
-        return toWrap.GetChild(row);
-    }
+    public IItem GetChild(int row) => toWrap.GetChild(row);
 
-    public Task Sort(int column, bool asc)
-    {
-        return toWrap.Sort(column, asc);
-    }
-
+    public Task Sort(int column, bool asc) => toWrap.Sort(column, asc);
 }

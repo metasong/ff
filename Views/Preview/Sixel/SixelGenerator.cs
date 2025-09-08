@@ -1,4 +1,4 @@
-﻿using ff.Views.Preview.Config;
+﻿using ff.Views.Preview.Config.Image;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;

@@ -20,7 +20,7 @@ public sealed class CurrentFolderPanel : View
         this.logger = logger;
         Add(itemListTable);
         itemListTable.SetFocus();
-        itemListTable.KeyDownHandler = ProcessKeyDown;
+        itemListTable.KeyDownHandler += ProcessKeyDown;
         itemListTable.SelectedCellChanged += SelectionChanged;
         itemListTable.CellActivated += ItemListTable_CellActivated;
 
@@ -38,7 +38,7 @@ public sealed class CurrentFolderPanel : View
 
     private void ShowData(IContainer state)
     {
-        itemListTable.ShowData(state);
+        itemListTable.View(state);
         PreviewItem(-1, itemListTable.SelectedRow);
     }
 

@@ -1,24 +1,31 @@
-﻿using ff.Views.Preview.Config;
-using SixLabors.ImageSharp.PixelFormats;
+﻿using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp;
 using ff.Views.Preview.Sixel;
+using ff.Views.Preview.Config.Image;
 
 namespace ff.Views.Preview;
 
-public class ImageView : View
+public class ImageView : View, IPreviewer
 {
+    private readonly ImageConfig config;
     private SixelGenerator sixelGenerator;
     private SixelToRender sixelToRender = new SixelToRender();
+    
 
     public ImageView(ImageConfig config)
     {
+        this.config = config;
         sixelGenerator = new SixelGenerator(config.Sixel);
         Width = Dim.Fill();
         Height = Dim.Fill();
     }
 
-    public void ShowImage(string path)
+    public bool CanView(IItem item)
+        => config.Exts.Any(ext => item.Name.EndsWith($".{ext}"));
+
+    public void View(IItem item)
     {
+        var path = item.FullName;
         //Application.Force16Colors = false;
         Image<Rgba32> image;
 
