@@ -1,5 +1,4 @@
-﻿using ff.State.FileSystem;
-using TerminalFileManager;
+﻿using TerminalFileManager;
 
 namespace ff.State.FileDataSystem;
 
@@ -19,6 +18,14 @@ public class FileSystemItem: IItem
     public bool IsLeaf => !IsDir;
     public IDataSystem DataSystem => FileSystem.FileDataSystem.Instance;
     public bool IsSelected { get; set; }
+    public IDictionary<string, string> Properties => new Dictionary<string, string>()
+    {
+        {"Creation", $"{FileSystemInfo.CreationTime.ToString(CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern)} (UTC: {FileSystemInfo.CreationTimeUtc.ToString(CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern)})"},
+        {"Modified", $"{FileSystemInfo.LastWriteTime.ToString(CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern)} (UTC: {FileSystemInfo.LastWriteTimeUtc.ToString(CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern)})"},
+        {"Accessed", $"{FileSystemInfo.LastAccessTime.ToString(CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern)} (UTC: {FileSystemInfo.LastAccessTimeUtc.ToString(CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern)})"},
+        {"Size",$"{Size:N0}({SizeReadable})"},
+        {"Attributes", $"{FileSystemInfo.Attributes}"}
+    };
 
     public string TypeString => FileSystemInfo is IFileInfo fi ? fi.Extension : $"<{DI.Localization.GetString("Directory")}>";
 

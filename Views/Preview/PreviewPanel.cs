@@ -7,7 +7,6 @@ public class PreviewPanel : View, IPreviewPanel
     private readonly ItemTable itemListTable = new();
     private readonly ImageView imageView;
     private readonly PreviewConfig config = new ();
-    private readonly TextItemView textItemView;
 
     private readonly IPreviewer[] Previewers; 
 
@@ -18,9 +17,9 @@ public class PreviewPanel : View, IPreviewPanel
         //BorderStyle = LineStyle.Dashed;
         //this.SetBackgroundColor(ColorName16.Blue);
         imageView = new(config.Image);
-        textItemView = new(config.Text);
+        var textItemView = new TextItemView(config.Text);
         stateManager.ActiveItemChanged += Navigator_ActiveItemChanged;
-        Previewers = [itemListTable, imageView, textItemView];
+        Previewers = [itemListTable, imageView, textItemView, new CommonItemView()];
     }
 
 

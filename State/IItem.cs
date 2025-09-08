@@ -10,4 +10,5 @@ public interface IItem
     bool IsLeaf { get; }// container or leaf
     IDataSystem DataSystem { get; }
     bool IsSelected { get; set; }
+    IDictionary<string, string> Properties { get;}
 }
