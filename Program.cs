@@ -1,7 +1,6 @@
 ﻿using ff;
 using ff.Localization;
 using ff.Views;
-using Attribute = Terminal.Gui.Drawing.Attribute;
 
 namespace TerminalFileManager;
 
@@ -19,7 +18,8 @@ internal class Program
         }
         catch (Exception ex)
         {
-            MessageBox.ErrorQuery("error", ex.ToString());
+            MessageBox.ErrorQuery("Error in App", ex.Message, "OK");
+            DI.GetLogger<Program>()?.LogError(ex, "Error in App");
         }
         finally
         {

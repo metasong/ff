@@ -50,7 +50,8 @@ public class PreviewPanel : View, IPreviewPanel
                 }
                 catch (Exception e)
                 {
-                    MessageBox.ErrorQuery("Error", e.ToString());
+                    MessageBox.ErrorQuery("Error", e.Message, "OK");
+                    return;
                 }
             }
         }
