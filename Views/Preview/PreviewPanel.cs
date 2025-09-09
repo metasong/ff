@@ -4,20 +4,22 @@ namespace ff.Views.Preview;
 
 public class PreviewPanel : View, IPreviewPanel
 {
+    private readonly ILogger<PreviewPanel> logger;
     private readonly ItemTable itemListTable = new();
     private readonly ImageView imageView;
     private readonly PreviewConfig config = new ();
 
     private readonly IPreviewer[] Previewers; 
 
-    public PreviewPanel(IStateManager stateManager)
+    public PreviewPanel(IStateManager stateManager, ILogger<PreviewPanel> logger)
     {
+        this.logger = logger;
         Width = Dim.Fill();
         Height = Dim.Fill();
         //BorderStyle = LineStyle.Dashed;
         //this.SetBackgroundColor(ColorName16.Blue);
         imageView = new(config.Image);
-        var textItemView = new TextItemView(config.Text);
+        var textItemView = new TextItemView(config.Text, logger);
         stateManager.ActiveItemChanged += Navigator_ActiveItemChanged;
         Previewers = [itemListTable, imageView, textItemView, new CommonItemView()];
     }
@@ -49,6 +51,7 @@ public class PreviewPanel : View, IPreviewPanel
                 }
                 catch (Exception e)
                 {
+                    logger.LogError(e, "Preview Error");
                     MessageBox.ErrorQuery("Error", e.Message, "OK");
                     return;
                 }

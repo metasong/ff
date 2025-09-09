@@ -1,18 +1,19 @@
-﻿using System.Collections.ObjectModel;
+﻿using ff.Utils;
 using ff.Views.Preview.Config.Image;
-using Terminal.Gui.Views;
+using TerminalFileManager;
 
 namespace ff.Views.Preview;
 
 public class TextItemView : TextView, IPreviewer
 {
     private readonly TextConfig config;
-
-    public TextItemView(TextConfig config)
+    private readonly ILogger logger;
+    public TextItemView(TextConfig config, ILogger logger)
     {
         this.config = config;
+        this.logger = logger;
         ReadOnly = true;
-        WordWrap = true;
+        //WordWrap = true; // if enable word wrapper exception will throw because of a bug: i.e. view this ff.sln
         Width = Dim.Fill();
         Height = Dim.Fill();
         VerticalScrollBar.AutoShow = true;
@@ -27,65 +28,23 @@ public class TextItemView : TextView, IPreviewer
         var content = File.ReadAllText(item.FullName);
         Text = content;
     }
-}
 
-public class CommonItemView : View, IPreviewer
-{
-    private readonly TableView table;
+    // then scroll a large file, ti become slow, so we will try to filler out event continuously event
+    // not work!
+    // because it's the event firing are slow, not showing the UI, the event firing are delayed after mouse scrolling: scrolling action then => delay 1-300msfire ->  delay 1-300msfire -> delay 1-300ms fire
+    //protected override bool OnMouseEvent(MouseEventArgs ev)
+    //{
+    //    
+    //    if (ev.Flags == MouseFlags.WheeledDown || ev.Flags == MouseFlags.WheeledUp|| ev.Flags == MouseFlags.WheeledRight|| ev.Flags == MouseFlags.WheeledLeft)
+    //    {
+    //        debouncer.Debounce(() => Application.Invoke(()=>
+    //        {
+    //            //logger.LogDebug($"");
+    //            base.OnMouseEvent(ev);
+    //        }), logger);
+    //        return true;
+    //    }
 
-    public CommonItemView()
-    {
-        Width = Dim.Fill();
-        Height = Dim.Fill();
-        VerticalScrollBar.AutoShow = true;
-        VerticalScrollBar.Visible = true;
-
-        table = new TableView(){Width = Dim.Fill(), Height = Dim.Fill()};
-
-        VerticalScrollBar.AutoShow = true;
-        HorizontalScrollBar.AutoShow = true;
-        table.MultiSelect = false;
-
-        var style = table.Style;
-        style.ShowHeaders = false;
-        style.AlwaysShowHeaders = true;
-
-        style.ShowHorizontalHeaderOverline = false;
-        style.ShowHorizontalBottomline = false;
-        style.ShowVerticalCellLines = false;
-        style.ShowVerticalHeaderLines = false;
-        style.ShowHorizontalHeaderUnderline = false;
-        Add(table);
-    }
-
-
-    public bool CanView(IItem item)
-        => true;
-
-    public void View(IItem item)
-    {
-        var properties = item.Properties;
-        table.Title = item.Name;
-        var source = new IDictionaryTableSource<string, string>(properties);
-        table.Table = source;
-    }
-}
-
-public class IDictionaryTableSource<K, V>(IDictionary<K, V> dictionary) : ITableSource
-{
-    private readonly KeyValuePair<K, V>[] keyValuePairs = dictionary.ToArray();
-
-    public string[] ColumnNames => ["Key", "Value"];
-    public int Columns => 2;
-
-    public object this[int row, int col]
-    {
-        get
-        {
-            var v = col == 0 ? keyValuePairs[row].Key.ToString() : keyValuePairs[row].Value.ToString();
-            return v;
-        }
-    }
-
-    public int Rows => keyValuePairs.Length;
+    //    return base.OnMouseEvent(ev);
+    //}
 }
