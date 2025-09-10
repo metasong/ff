@@ -8,7 +8,6 @@ public partial class ItemTable
         if (textField == null)
         {
             textField = new TextField() { Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped };
-            textField.KeyUp += TextField_KeyUp;
             textField.KeyDown += TextField_KeyDown;
             Add(textField);
         }
@@ -29,11 +28,6 @@ public partial class ItemTable
             
             e.Handled = true;
         }
-    }
-
-    private void TextField_KeyUp(object? sender, Key e)
-    {
-        
     }
 
     private void HideRename()
