@@ -24,7 +24,7 @@ public partial class ItemTable
         if (e.KeyCode == KeyCode.Enter)
         {
             Console.WriteLine("dd");
-            textField.Visible = false;
+            textField!.Visible = false;
             
             e.Handled = true;
         }
