@@ -47,23 +47,33 @@ public partial class ItemTable : TableView, IPreviewer
         KeyBindings.ReplaceCommands(Key.Home, Command.Start);//LeftStart
         KeyBindings.ReplaceCommands(Key.End, Command.End);//RightEnd
 
-        //ColumnStyle nameStyle = Style.GetOrCreateColumnStyle(0);
-        //nameStyle.MinWidth = 10;
-        //nameStyle.ColorGetter = ColorGetter;
+        var selectionStyle = new ColumnStyle() {};
+        var nameStyle = new ColumnStyle() { MinWidth = 10 /*ColorGetter = */};
+        var sizeStyle = new ColumnStyle() { MinWidth = 10 };
+        var dateStyle = new ColumnStyle() { MinWidth = 10 };
+        Style.ColumnStyles.Add(0, selectionStyle);
+        Style.ColumnStyles.Add(1, nameStyle);
+        Style.ColumnStyles.Add(2, sizeStyle);
+        Style.ColumnStyles.Add(3, dateStyle);
 
-        //ColumnStyle sizeStyle = Style.GetOrCreateColumnStyle(1);
-        //sizeStyle.MinWidth = 10;
-        //sizeStyle.ColorGetter = ColorGetter;
 
-        //ColumnStyle dateModifiedStyle = Style.GetOrCreateColumnStyle(2);
-        //dateModifiedStyle.MinWidth = 30;
-        //dateModifiedStyle.ColorGetter = ColorGetter;
         oldScheme = GetScheme();
 
         Style.RowColorGetter = RowColorGetter;
 
         CreateContextMenu();
 
+    }
+
+    public bool ShowSelectionBox
+    {
+        get => showSelectionBox;
+        set
+        {
+            showSelectionBox = value;
+            //if (currentContainer != null) View(currentContainer);
+            Style.ColumnStyles[0].Visible = value;
+        }
     }
 
     private Scheme RowColorGetter(RowColorGetterArgs args)
@@ -123,12 +133,12 @@ public partial class ItemTable : TableView, IPreviewer
             if (clickedCell != null)
             {
                 var xOriginal = clickedCell.Value.X;
-                var x = ShowSelectionBox ? xOriginal - 1 : xOriginal;
+                var x = xOriginal;
                 var y = clickedCell.Value.Y;
-                if (x == 0 && SelectedRow == y) // rename active row
+                if (x == 1 && SelectedRow == y) // rename active row
                 {
                     var item = TableSource.GetChild(y);
-                    RenameCommand(xOriginal + 3, e.Position.Y, item);
+                    RenameCommand(xOriginal + 1/*icon*/+(ShowSelectionBox?2/*checkbox column*/:0), e.Position.Y, item);
                     return true;
                 }
             }
@@ -144,7 +154,7 @@ public partial class ItemTable : TableView, IPreviewer
         {
             if (clickedHeaderCol != null)
             {
-                clickedHeaderCol = ShowSelectionBox ? clickedHeaderCol - 1 : clickedHeaderCol;
+                clickedHeaderCol =  clickedHeaderCol - 1; // the original table source do not have selection
                 if (clickedHeaderCol >= 0)
                 {
                     currentSortIsAsc = currentSortColumn != clickedHeaderCol || !currentSortIsAsc;
@@ -208,8 +218,8 @@ public partial class ItemTable : TableView, IPreviewer
         currentContainer = (IContainer)container;
         TableSource?.Dispose();
         var source = container.DataSystem.GetTableSource(currentContainer, currentSortColumn, currentSortIsAsc);
-        if (ShowSelectionBox)
-            source = new SelectableSortableTableSource(this, source);
+        //if (ShowSelectionBox)
+        source = new SelectableSortableTableSource(this, source);
         Table = source;
 
     }
@@ -250,16 +260,6 @@ public partial class ItemTable : TableView, IPreviewer
 
         var newRect = new TableSelection(new(0, row), new(0, row, 1, 1)) { IsToggled = true };
         MultiSelectedRegions.Push(newRect);
-    }
-
-    public bool ShowSelectionBox
-    {
-        get => showSelectionBox;
-        set
-        {
-            showSelectionBox = value;
-            if (currentContainer != null) View(currentContainer);
-        }
     }
 
     private void CreateContextMenu()
