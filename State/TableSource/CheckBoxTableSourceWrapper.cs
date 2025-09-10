@@ -23,6 +23,8 @@ public class CheckBoxTableSourceWrapper : ITableSource
                 tableView.SetSelectionInToggleableState(i);
             }
         }
+
+        selectedAll = toWrap.Container.Children.All(it => it.IsSelected);
     }
 
     public Rune CheckedRune { get; set; } = Glyphs.CheckStateChecked;
@@ -90,15 +92,27 @@ public class CheckBoxTableSourceWrapper : ITableSource
     protected virtual void ToggleAllRows()
     {
         if (selectedAll)
+        {
             tableView.SelectAllInToggleableState();
+            foreach (var child in WrappedTableSource.Container.Children)
+            {
+                child.IsSelected = true;
+            }
+        }
         else
+        {
             tableView.MultiSelectedRegions.Clear();
+            foreach (var child in WrappedTableSource.Container.Children)
+            {
+                child.IsSelected = false;
+            }
+        }
     }
 
     protected virtual void ToggleRow(int row)
     {
-        var item = WrappedTableSource.GetChild(row);
-        item.IsSelected = !item.IsSelected;
+        //var item = WrappedTableSource.GetChild(row);
+        //item.IsSelected = !item.IsSelected;
     }
 
     protected virtual void ToggleRows(int[] range) { }

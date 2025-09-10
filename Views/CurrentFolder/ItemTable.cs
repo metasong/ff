@@ -195,6 +195,8 @@ public partial class ItemTable : TableView, IPreviewer
             }
         }
 
+        var item = TableSource.GetChild(args.Row);
+        item.IsSelected = !item.IsSelected;
         base.OnCellToggled(args);
     }
 
