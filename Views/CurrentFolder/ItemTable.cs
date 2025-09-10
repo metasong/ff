@@ -11,7 +11,7 @@ public static class ExtTableView
         tableView.MultiSelectedRegions.Any(r => r.Rectangle.Bottom > row && r.Rectangle.Top <= row);
 }
 
-public class ItemTable : TableView, IPreviewer
+public partial class ItemTable : TableView, IPreviewer
 {
     private int currentSortColumn;
     private bool currentSortIsAsc = true;
@@ -106,7 +106,8 @@ public class ItemTable : TableView, IPreviewer
     //};
 
     protected override bool OnKeyDown(Key key)
-    { if (KeyDownHandler?.Invoke(key) ?? false)
+    {
+        if (KeyDownHandler?.Invoke(key) ?? false)
         {
             return true;
         }
@@ -114,6 +115,28 @@ public class ItemTable : TableView, IPreviewer
         return base.OnKeyDown(key);
     }
 
+    protected override bool OnMouseEvent(MouseEventArgs e)
+    {
+        if (e.Flags.HasFlag(MouseFlags.Button1Clicked)) // left click
+        {
+            var clickedCell = ScreenToCell(e.Position.X, e.Position.Y, out var clickedHeaderCol);
+            if (clickedCell != null)
+            {
+                var xOriginal = clickedCell.Value.X;
+                var x = ShowSelectionBox ? xOriginal - 1 : xOriginal;
+                var y = clickedCell.Value.Y;
+                if (x == 0 && SelectedRow == y) // rename active row
+                {
+                    var item = TableSource.GetChild(y);
+                    RenameCommand(xOriginal + 3, e.Position.Y, item);
+                    return true;
+                }
+            }
+        }
+
+        HideRename();
+        return base.OnMouseEvent(e);
+    }
     protected override bool OnMouseClick(MouseEventArgs e)
     {
         var clickedCell = ScreenToCell(e.Position.X, e.Position.Y, out var clickedHeaderCol);
@@ -130,13 +153,16 @@ public class ItemTable : TableView, IPreviewer
                     return true; // stop further process
                 }
             }
+            
+
         }
 
         if (e.Flags.HasFlag(MouseFlags.Button1DoubleClicked)) // left double click
         {
 
 
-        } else if (e.Flags.HasFlag((MouseFlags.Button3Clicked))) // right button click
+        }
+        else if (e.Flags.HasFlag((MouseFlags.Button3Clicked))) // right button click
         {
             contextMenu.MakeVisible(e.ScreenPosition);
             UpdateContextMenu();
@@ -208,7 +234,8 @@ public class ItemTable : TableView, IPreviewer
             new(
                 new(SelectedColumn, SelectedRow),
                 new(0, 0, Table.Columns, Table.Rows)
-            ){IsToggled = true}
+            )
+            { IsToggled = true }
         );
         Update();
     }
@@ -217,11 +244,11 @@ public class ItemTable : TableView, IPreviewer
     {
         if (!toggle)
         {
-            SetSelection(0,row,false);
+            SetSelection(0, row, false);
             return;
         }
 
-        var newRect = new TableSelection(new(0, row), new(0, row, 1, 1) ){IsToggled = true};
+        var newRect = new TableSelection(new(0, row), new(0, row, 1, 1)) { IsToggled = true };
         MultiSelectedRegions.Push(newRect);
     }
 
@@ -241,8 +268,8 @@ public class ItemTable : TableView, IPreviewer
         {
             Title = "Show Selection Box",
             //Key = Key.S.WithCtrl,
-            
-            CommandView = new CheckBox() { Title = "Show Selection Box", CanFocus = false,CheckedState = ShowSelectionBox ? CheckState.Checked: CheckState.UnChecked}
+
+            CommandView = new CheckBox() { Title = "Show Selection Box", CanFocus = false, CheckedState = ShowSelectionBox ? CheckState.Checked : CheckState.UnChecked }
         };
 
         showSelection.Action = () =>
@@ -254,14 +281,14 @@ public class ItemTable : TableView, IPreviewer
         contextMenu = new PopoverMenu([
             showSelection
         ]);
-        
+
     }
 
     private void UpdateContextMenu()
     {
         var menuItems = contextMenu.Root.SubViews.Cast<MenuItemv2>().ToArray();
         var showSelectionCheckbox = (CheckBox)(menuItems[0].CommandView);
-        showSelectionCheckbox. CheckedState = ShowSelectionBox ? CheckState.Checked : CheckState.UnChecked;
+        showSelectionCheckbox.CheckedState = ShowSelectionBox ? CheckState.Checked : CheckState.UnChecked;
     }
 
 
