@@ -9,15 +9,28 @@
 
     <ItemGroup>
         <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
-        <PackageReference Include="Terminal.Gui" Version="2.0.0-develop.4538" />
+        <!--<PackageReference Include="Terminal.Gui" Version="2.0.0-develop.4538" />-->
+        <PackageReference Include="ColorHelper" Version="1.8.1" />
+        <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.9" />
+        <PackageReference Include="System.IO.Abstractions" Version="22.0.15" />
+        <PackageReference Include="Wcwidth" Version="2.0.0" />
+        <!--remove above transparent package because of Terminal.Gui-->
+
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.8" />
         <PackageReference Include="Microsoft.Extensions.Localization" Version="9.0.8" />
-        <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.8" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.8" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.9" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.9" />
     </ItemGroup>
 
     <ItemGroup>
         <Folder Include="Properties\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Terminal.Gui">
+        <HintPath>C:\tmp\Terminal.Gui\Terminal.Gui\bin\Debug\net8.0\Terminal.Gui.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
     <ItemGroup>

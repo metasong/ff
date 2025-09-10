@@ -1,4 +1,5 @@
 ﻿using TerminalFileManager;
+using IFileInfo = System.IO.Abstractions.IFileInfo;
 
 namespace ff.State.FileDataSystem;
 

@@ -10,3 +10,5 @@
       1. > to trigger searching
    1. localization with json config files(remove old one based on .resx file)
    1. with DI
+   ~~1. Previewer of Text with auto vertical scrolling bar.~~ there is bug in scrollbar and integrated scrolling. will waiting for official fix.
+   1. inline rename
