@@ -1,5 +1,4 @@
 ﻿using ff.State.TableSource;
-using Terminal.Gui.Views;
 
 namespace ff.Views.CurrentFolder;
 

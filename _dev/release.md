@@ -12,4 +12,6 @@
    1. with DI
    ~~1. Previewer of Text with auto vertical scrolling bar.~~ there is bug in scrollbar and integrated scrolling. will waiting for official fix.
    1. inline rename
-   1. command and key trigger
+   1. command and key trigger system
+       1. refence and compatable with TerminalUI
+       1. extend or implement one that can be confiurable with json

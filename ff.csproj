@@ -24,6 +24,8 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Folder Include="Action\Keybinding\" />
+        <Folder Include="Action\MouseBinding\" />
         <Folder Include="Properties\" />
     </ItemGroup>
 

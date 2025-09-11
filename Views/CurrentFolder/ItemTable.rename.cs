@@ -1,6 +1,4 @@
-﻿using Terminal.Gui.Views;
-
-namespace ff.Views.CurrentFolder;
+﻿namespace ff.Views.CurrentFolder;
 
 public partial class ItemTable
 {
