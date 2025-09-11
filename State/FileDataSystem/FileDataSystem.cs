@@ -1,4 +1,5 @@
 using ff.State.FileDataSystem;
+using DefaultFileOperations = ff.State.FileDataSystem.DefaultFileOperations;
 
 namespace ff.State.FileSystem;
 
@@ -27,4 +28,7 @@ public class FileDataSystem() : IDataSystem
 
         return ColorProvider.GetColorScheme(state, current);
     }
+
+    public IOperations Operations { get; private set; } = new DefaultFileOperations();
 }
+

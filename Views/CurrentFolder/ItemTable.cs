@@ -213,6 +213,7 @@ public partial class ItemTable : TableView, IPreviewer
         return false;
     }
 
+    #region IPreviewer
     public bool CanView(IItem item) => item is IContainer;
 
     public void View(IItem container)
@@ -225,6 +226,7 @@ public partial class ItemTable : TableView, IPreviewer
         Table = source;
 
     }
+    #endregion
 
     public void SelectAllInToggleableState(bool toggle = true)
     {

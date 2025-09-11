@@ -1,4 +1,6 @@
-﻿namespace ff.Views.CurrentFolder;
+﻿using Terminal.Gui.Views;
+
+namespace ff.Views.CurrentFolder;
 
 public partial class ItemTable
 {
@@ -17,15 +19,16 @@ public partial class ItemTable
         textField.Width = item.Name.Length;
         textField.Text = item.Name;
         textField.Visible = true;
+        textField.Data = item;
     }
 
     private void TextField_KeyDown(object? sender, Key e)
     {
         if (e.KeyCode == KeyCode.Enter)
         {
-            Console.WriteLine("dd");
+            var it = (IItem)(textField.Data);
+            it.DataSystem.Operations.Rename(it, textField.Text);
             textField!.Visible = false;
-            
             e.Handled = true;
         }
     }

@@ -12,3 +12,4 @@
    1. with DI
    ~~1. Previewer of Text with auto vertical scrolling bar.~~ there is bug in scrollbar and integrated scrolling. will waiting for official fix.
    1. inline rename
+   1. command and key trigger
