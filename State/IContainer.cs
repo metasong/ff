@@ -3,7 +3,7 @@
 public interface IContainer: IItem
 {
     IItem[] Children { get; }
-    event Action ChildrenUpdated;
+    event System.Action ChildrenUpdated;
     IItem? ActiveChild { get; set; }
     IContainer? GetParent();
     new bool IsLeaf => false;

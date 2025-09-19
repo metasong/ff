@@ -21,6 +21,7 @@
         <PackageReference Include="Microsoft.Extensions.Localization" Version="9.0.8" />
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.9" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.9" />
+        <PackageReference Include="System.Drawing.Common" Version="9.0.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -31,7 +32,7 @@
 
     <ItemGroup>
       <Reference Include="Terminal.Gui">
-        <HintPath>C:\tmp\Terminal.Gui\Terminal.Gui\bin\Debug\net8.0\Terminal.Gui.dll</HintPath>
+        <HintPath>C:\Repo\Github\Terminal.Gui\Terminal.Gui\bin\Debug\net8.0\Terminal.Gui.dll</HintPath>
       </Reference>
     </ItemGroup>
 

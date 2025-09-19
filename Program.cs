@@ -33,7 +33,7 @@ internal class Program
             .ConfigureAppConfiguration((context, config) =>
             {
                 config.Sources.Clear();
-                config.SetBasePath(Directory.GetCurrentDirectory())
+                config
                     .AddJsonFile("config.json", optional: false, reloadOnChange: true)
                     .AddJsonFile("config.user.json", optional: true, reloadOnChange: true)
                     .AddEnvironmentVariables();

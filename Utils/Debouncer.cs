@@ -29,7 +29,7 @@ public class Debouncer
     /// the interval expires, the previous pending action is cancelled and the timer is reset.
     /// </summary>
     /// <param name="action">The action to execute.</param>
-    public void Debounce(Action action, ILogger? logger = null)
+    public void Debounce(System.Action action, ILogger? logger = null)
     {
         // Cancel any previously scheduled action
         cancellationTokenSource?.Cancel();

@@ -40,11 +40,33 @@ public class TextItemView : TextView, IPreviewer
     public bool CanView(IItem item)
         => config.Exts.Any(ext => item.Name.EndsWith($".{ext}"));
 
+    public static string ReadText(string path, int MaxLines = 100)
+    {
+        var lines = new List<string>(MaxLines);
+        using (var reader = new StreamReader(path))
+        {
+            string? line;
+            int count = 0;
+            while (count < MaxLines && (line = reader.ReadLine()) != null)
+            {
+                lines.Add(line);
+                count++;
+            }
+            if (count == MaxLines)
+            {
+                // too slow for large file
+                lines.Add($"---- Max {MaxLines} lines for preview ---- ");
+            }
+        }
+
+        return string.Join('\n', lines);
+    }
+
     public void View(IItem item)
     {
-        var content = File.ReadAllText(item.FullName);
-        Text = content;
-        var lines = content.Split('\n');
+        Text = ReadText(item.FullName);
+        // Optionally, you can split lines if you need the count for scrollbars, etc.
+        // var lines = Text.Split('\n');
         ////SetContentSize(new(Frame.Width,lines.Length));
         //scrollBar.Position = 0;
         //scrollBar.ScrollableContentSize = lines.Length;

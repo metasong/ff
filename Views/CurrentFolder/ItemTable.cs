@@ -72,6 +72,7 @@ public partial class ItemTable : TableView, IPreviewer
             showSelectionBox = value;
             //if (currentContainer != null) View(currentContainer);
             Style.ColumnStyles[0].Visible = value;
+            SetNeedsDraw();
         }
     }
 

@@ -1,4 +1,5 @@
-﻿using TerminalFileManager;
+﻿using System.Drawing;
+using TerminalFileManager;
 using IFileInfo = System.IO.Abstractions.IFileInfo;
 
 namespace ff.State.FileDataSystem;
@@ -19,14 +20,36 @@ public class FileSystemItem: IItem
     public bool IsLeaf => !IsDir;
     public IDataSystem DataSystem => FileSystem.FileDataSystem.Instance;
     public bool IsSelected { get; set; }
-    public IDictionary<string, string> Properties => new Dictionary<string, string>()
+    public IDictionary<string, string> Properties
     {
-        {"Creation", $"{FileSystemInfo.CreationTime.ToString(CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern)} (UTC: {FileSystemInfo.CreationTimeUtc.ToString(CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern)})"},
-        {"Modified", $"{FileSystemInfo.LastWriteTime.ToString(CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern)} (UTC: {FileSystemInfo.LastWriteTimeUtc.ToString(CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern)})"},
-        {"Accessed", $"{FileSystemInfo.LastAccessTime.ToString(CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern)} (UTC: {FileSystemInfo.LastAccessTimeUtc.ToString(CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern)})"},
-        {"Size",$"{Size:N0}({SizeReadable})"},
-        {"Attributes", $"{FileSystemInfo.Attributes}"}
-    };
+        get
+        {
+            var dict = new Dictionary<string, string>
+            {
+                {"Creation", $"{FileSystemInfo.CreationTime.ToString(CultureInfo.CurrentCulture.DateTimeFormat.UniversalSortableDateTimePattern)} (UTC: {FileSystemInfo.CreationTimeUtc.ToString(CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern)})"},
+                {"Modified", $"{FileSystemInfo.LastWriteTime.ToString(CultureInfo.CurrentCulture.DateTimeFormat.UniversalSortableDateTimePattern)} (UTC: {FileSystemInfo.LastWriteTimeUtc.ToString(CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern)})"},
+                {"Accessed", $"{FileSystemInfo.LastAccessTime.ToString(CultureInfo.CurrentCulture.DateTimeFormat.UniversalSortableDateTimePattern)} (UTC: {FileSystemInfo.LastAccessTimeUtc.ToString(CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern)})"},
+                {"Size",$"{Size:N0}({SizeReadable})"},
+                {"Attributes", $"{FileSystemInfo.Attributes}"},
+            };
+
+            if (IsImage && FileSystemInfo is IFileInfo fi)
+            {
+                try
+                {
+                    using var img = new Bitmap(fi.FullName);
+                    dict["Image Size"] = $"{img.Width} x {img.Height}";
+                    dict["Bit Depth"] = $"{Image.GetPixelFormatSize(img.PixelFormat)}";
+                }
+                catch
+                {
+                    // Optionally log or ignore image loading errors
+                }
+            }
+
+            return dict;
+        }
+    }
 
     public string TypeString => FileSystemInfo is IFileInfo fi ? fi.Extension : $"<{DI.Localization.GetString("Directory")}>";
 

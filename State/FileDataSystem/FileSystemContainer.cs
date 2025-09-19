@@ -73,7 +73,7 @@ public class FileSystemContainer(IDirectoryInfo dir, FileSystemItem[]? children 
         internal set => children = value;
     }
 
-    public event Action? ChildrenUpdated;
+    public event System.Action? ChildrenUpdated;
     public IItem? ActiveChild { get; set; }
     public IDirectoryInfo Directory { get; } = dir;
 

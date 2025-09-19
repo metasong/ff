@@ -77,7 +77,7 @@ internal class CurrentFolderTableSource : ISortableTableSource
             case 1:
                 return item.SizeReadable;
             case 2:
-                return item.LastWriteTime.ToString(CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern);
+                return item.LastWriteTime.ToString(CultureInfo.CurrentCulture.DateTimeFormat.UniversalSortableDateTimePattern);
             default:
                 throw new ArgumentOutOfRangeException(nameof(col));
         }
