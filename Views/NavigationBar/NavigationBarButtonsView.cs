@@ -1,6 +1,4 @@
-﻿using Terminal.Gui;
-
-namespace ff.Views.NavigationBar;
+﻿namespace ff.Views.NavigationBar;
 
 public class NavigationBarButtonsView : View
 {
@@ -11,20 +9,22 @@ public class NavigationBarButtonsView : View
 
     public NavigationBarButtonsView(IStateManager state)
     {
-        X = 0;
-        Y = 0;
+        BtnHome = CreateButton(0, 0, $"{Glyphs.IdenticalTo}", (s, e) => { 
+            e.Handled = true;
+        });
 
-        BtnHome = new() { X = 0, Y = 0, NoPadding = true, Text = $"{Glyphs.IdenticalTo}", ShadowStyle = ShadowStyle.None, };
-        BtnHome.Accepting += (s, e) => { e.Handled = true; };
-
-        BtnUp = new() { X = Pos.Right(BtnHome), Y = 0, NoPadding = true, Text = "▲",ShadowStyle = ShadowStyle.None, };
-        BtnUp.Accepting += (s, e) => { state.Up(); e.Handled = true; };
-
-        BtnBack = new() { X = Pos.Right(BtnUp), Y = 0, NoPadding = true, Text = $"{Glyphs.LeftArrow}", ShadowStyle = ShadowStyle.None, };
-        BtnBack.Accepting += (s, e) => { state.Back(); e.Handled = true; };
-
-        BtnForward = new() { X = Pos.Right(BtnBack), Y = 0, NoPadding = true, Text = $"{Glyphs.RightArrow}" , ShadowStyle = ShadowStyle.None, };
-        BtnForward.Accepting += (s, e) => { state.Forward(); e.Handled = true; };
+        BtnUp = CreateButton(Pos.Right(BtnHome), 0, "▲", (s, e) => { 
+            state.Up(); 
+            e.Handled = true; 
+        });
+        BtnBack = CreateButton(Pos.Right(BtnUp), 0, $"{Glyphs.LeftArrow}", (s, e) => { 
+            state.Back(); 
+            e.Handled = true; 
+        });
+        BtnForward = CreateButton(Pos.Right(BtnBack), 0, $"{Glyphs.RightArrow}", (s, e) => {
+            state.Forward(); 
+            e.Handled = true; 
+        });
 
         Add(BtnHome);
         Add(BtnUp);
@@ -33,5 +33,20 @@ public class NavigationBarButtonsView : View
 
         Height = Dim.Fill();
         Width = Dim.Auto();
+    }
+
+    private static Button CreateButton(Pos x, Pos y, string text, EventHandler<CommandEventArgs> onAccept)
+    {
+        var btn = new Button
+        {
+            X = x,
+            Y = y,
+            NoPadding = true,
+            ShadowStyle = ShadowStyle.None,
+            Text = text
+        };
+
+        btn.Accepting += onAccept;
+        return btn;
     }
 }

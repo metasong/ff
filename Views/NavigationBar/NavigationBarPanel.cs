@@ -9,6 +9,7 @@ public sealed class NavigationBarPanel : View
     public NavigationBarPanel(IStateManager state, ILogger<NavigationBarPanel> logger)
     {
         this.state = state;
+        CanFocus = true;
         Width = Dim.Fill();
         Height = Dim.Fill();
 

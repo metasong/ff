@@ -19,7 +19,8 @@ internal sealed class NavigationBarTextView: View
     private static readonly char[] BadChars = ['"', '<', '>', '|', '*', '?'];
 
     public NavigationBarTextView(IStateManager stateManager)
-    {       
+    {
+        CanFocus = true;
         this.stateManager = stateManager;
         InitializeComponents();
         this.stateManager.ContainerChanged += (oldState, newState) =>
