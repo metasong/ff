@@ -3,7 +3,7 @@
 /// <summary>
 /// the subview when user want to see/modify the path of current folder, without the selected item part.
 /// </summary>
-internal sealed class NavigationBarTextView: View
+internal sealed class NavigationBarTextView : View
 {
     private readonly IStateManager stateManager;
     public IFileSystem FileSystem { get; }
@@ -53,7 +53,7 @@ internal sealed class NavigationBarTextView: View
         tbPath.Autocomplete = new AppendAutocomplete(tbPath);
         tbPath.Autocomplete.SuggestionGenerator = new PathSuggestionGenerator();
 
-        //tbPath.TextChanged += (s, e) => PathChanged();
+        tbPath.TextChanged += (s, e) => PathChanged();
 
         SetStyle();
         tbPath.Autocomplete.Scheme = new(tbPath.GetScheme())
@@ -72,10 +72,7 @@ internal sealed class NavigationBarTextView: View
         {
             key.Handled = true;
 
-            // User hit Enter in text box so probably wants the
-            // contents of the text box as their selection not
-            // whatever lingering selection is in TableView
-            //Accept(false);
+            stateManager.GoTo(SystemSwitch.GetState(tbPath.Text));
         }
     }
     private void SetStyle()
@@ -92,30 +89,21 @@ internal sealed class NavigationBarTextView: View
             return;
         }
 
-        var dir = FileSystem.ToDirectoryInfo(path);
-
-        if (dir.Exists)
-        {
-            //stateManager.Push();
-        }
-        else if (dir.Parent?.Exists ?? false)
-        {
-            //PushState(dir.Parent, true, false);
-        }
-
         tbPath.Autocomplete.GenerateSuggestions(
             new AutocompleteFilePathContext(tbPath.Text, tbPath.CursorPosition, stateManager.CurrentContainer)
         );
     }
-    
+
     private void SuppressIfBadChar(Key k)
     {
-        // don't let user type bad letters
-        var ch = (char)k;
-
-        if (BadChars.Contains(ch))
+        // Only check printable keys, otherwise the End key would be converted to ", which is BadChars, so can not move cursor to end
+        if (k.KeyCode is >= KeyCode.Space and <= KeyCode.Z) 
         {
-            k.Handled = true;
+            var ch = (char)k;
+            if (BadChars.Contains(ch))
+            {
+                k.Handled = true;
+            }
         }
     }
 

@@ -5,7 +5,7 @@ namespace ff.Views.Preview;
 public class PreviewPanel : View, IPreviewPanel
 {
     private readonly ILogger<PreviewPanel> logger;
-    private readonly ItemTable itemListTable = new();
+    private readonly ItemTable itemListTable = new() { ShowSelectionBox = false};
     private readonly ImageView imageView;
     private readonly PreviewConfig config = new ();
 

@@ -1,4 +1,6 @@
-﻿namespace ff.State.FileDataSystem;
+﻿namespace ff.State.Implements.FileDataSystem;
+
+using ff.State;
 
 using System.IO.Abstractions;
 using TerminalFileManager;

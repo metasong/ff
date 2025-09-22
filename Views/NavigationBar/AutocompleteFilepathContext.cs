@@ -1,9 +1,7 @@
-using ff.State.FileDataSystem;
-
 namespace ff.Views.NavigationBar;
 
-internal class AutocompleteFilePathContext (string currentLine, int cursorPosition, IContainer state)
+internal class AutocompleteFilePathContext (string currentLine, int cursorPosition, IContainer CurrentContainer)
     : AutocompleteContext (Cell.ToCellList (currentLine), cursorPosition)
 {
-    public IContainer State { get; set; } = state;
+    public IContainer CurrentContainer { get; set; } = CurrentContainer;
 }

@@ -4,77 +4,102 @@ namespace ff.Views.NavigationBar;
 
 internal class PathSuggestionGenerator : ISuggestionGenerator
 {
-    private IContainer? state;
+    private IContainer? CurrentContainer;
 
-    public IEnumerable<Suggestion> GenerateSuggestions (AutocompleteContext context)
+    public IEnumerable<Suggestion> GenerateSuggestions(AutocompleteContext context)
     {
-        if (context is AutocompleteFilePathContext fileState)
-        {
-            state = fileState.State;
-        }
-
-        if (state is null)
+        return [];
+        if (context is not AutocompleteFilePathContext fileState)
         {
             return [];
         }
 
-        var path = Cell.ToString (context.CurrentLine);
-        var last = path.LastIndexOfAny (NavigationBarPanel.DirectorySeparators);
+        CurrentContainer = fileState.CurrentContainer;
 
-        if (string.IsNullOrWhiteSpace (path) || !Path.IsPathRooted (path))
+        var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
+        var path = Cell.ToString(context.CurrentLine);
+        if (string.IsNullOrWhiteSpace(path) || path[0] == '.')
         {
-            return [];
+            path = Path.Combine(CurrentContainer.FullName, path);
+        }
+        //to here:the Path.IsPathRooted(path), full path
+        var pathParts = path.Split(NavigationBarPanel.DirectorySeparators, StringSplitOptions.RemoveEmptyEntries);
+
+        var sb = new StringBuilder();
+        var termToComplete = "";
+        for (int i = 0; i < pathParts.Length; i++)
+        {
+            var part = pathParts[i];
+            if (Path.Exists($"{sb}"))
+            {
+                sb.Append(part);
+                continue;
+            }
+            else
+            {
+                termToComplete = part;
+            }
         }
 
-        var term = path.Substring (last + 1);
+        var availablePath = $"{sb}";
+
+        //var last = path.LastIndexOfAny(NavigationBarPanel.DirectorySeparators);
+        //var term = path.Substring(last + 1);
 
         // If path is /tmp/ then don't just list everything in it
-        if (string.IsNullOrWhiteSpace (term))
+        if (string.IsNullOrWhiteSpace(termToComplete))
         {
             return [];
         }
 
-        if (term.Equals (state?.Name))
+
+        var isCurrentContainerPath = isWindows
+            ? string.Equals(path, CurrentContainer.FullName, StringComparison.InvariantCultureIgnoreCase)
+            : string.Equals(path, CurrentContainer.FullName, StringComparison.InvariantCulture);
+
+        if (isCurrentContainerPath)
         {
             // Clear suggestions
             return [];
         }
 
-        var isWindows = RuntimeInformation.IsOSPlatform (OSPlatform.Windows);
-
-        string [] suggestions = state.Children
-            .Select (
-                e => e.IsLeaf
-                    ? e.Name
-                    : e.Name + Path.DirectorySeparatorChar
+        // scan path one by one seperated by seperator, until the one not exist, which is the term to complete
+        string[] suggestions = Directory.EnumerateFileSystemEntries(availablePath)
+            .OrderBy(entry => !Directory.Exists(entry)) // directories first, then files
+            .ThenBy(entry => Path.GetFileName(entry), isWindows ? StringComparer.InvariantCultureIgnoreCase : StringComparer.InvariantCulture)
+            .Select(entry =>
+                Directory.Exists(entry)
+                    ? Path.GetFileName(entry) + Path.DirectorySeparatorChar
+                    : Path.GetFileName(entry)
             )
-            .ToArray ();
+            .ToArray();
 
-        string [] validSuggestions = suggestions
-            .Where (
-                s => s.StartsWith (
-                    term,
+        string[] validSuggestions = suggestions
+            .Where(
+                s => s.StartsWith(
+                    termToComplete,
                     isWindows
                         ? StringComparison.InvariantCultureIgnoreCase
                         : StringComparison.InvariantCulture
                 )
             )
-            .OrderBy (m => m.Length)
-            .ToArray ();
+            .OrderBy(m => m.Length)
+            .ToArray();
 
         // nothing to suggest
-        if (validSuggestions.Length == 0 || validSuggestions [0].Length == term.Length)
+        if (validSuggestions.Length == 0 || validSuggestions[0].Length == termToComplete.Length)
         {
             return [];
         }
 
-        return validSuggestions.Select (
-                f => new Suggestion (term.Length, f, f)
+        return validSuggestions.Select(
+                f => new Suggestion(termToComplete.Length, f, f)
             )
-            .ToList ();
+            .ToList();
     }
 
-    public bool IsWordChar (Rune rune)
+    public bool IsWordChar(Rune rune)
     {
         if (rune.Value == '\n')
         {

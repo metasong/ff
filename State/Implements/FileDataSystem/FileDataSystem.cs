@@ -1,7 +1,6 @@
-using ff.State.FileDataSystem;
-using DefaultFileOperations = ff.State.FileDataSystem.DefaultFileOperations;
+using DefaultFileOperations = ff.State.Implements.FileDataSystem.DefaultFileOperations;
 
-namespace ff.State.FileSystem;
+namespace ff.State.Implements.FileDataSystem;
 
 public class FileDataSystem() : IDataSystem
 {

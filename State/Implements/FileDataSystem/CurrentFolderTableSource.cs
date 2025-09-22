@@ -1,7 +1,7 @@
 ﻿using Terminal.Gui.FileServices;
 using TerminalFileManager;
 
-namespace ff.State.FileDataSystem;
+namespace ff.State.Implements.FileDataSystem;
 
 internal class CurrentFolderTableSource : ISortableTableSource
 {
@@ -92,7 +92,6 @@ internal class CurrentFolderTableSource : ISortableTableSource
 
         return name;
     }
-
 
     public void Dispose()
     {

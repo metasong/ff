@@ -1,4 +1,4 @@
-namespace ff.State.FileDataSystem;
+namespace ff.State.Implements.FileDataSystem;
 
 /// <summary>Default file operation handlers using modal dialogs.</summary>
 public class DefaultFileOperations : IOperations

@@ -14,7 +14,7 @@ public sealed class NavigationBarPanel : View
         Height = Dim.Fill();
 
         buttonsView = new NavigationBarButtonsView(state);
-        textView = new NavigationBarTextView(state) { X = Pos.Right(buttonsView) };
+        textView = new NavigationBarTextView(state) { X = Pos.Right(buttonsView) + 1};
 
         state.ContainerChanged += ContainerContainerChanged;
 

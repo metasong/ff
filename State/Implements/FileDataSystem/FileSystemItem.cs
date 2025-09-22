@@ -2,7 +2,7 @@
 using TerminalFileManager;
 using IFileInfo = System.IO.Abstractions.IFileInfo;
 
-namespace ff.State.FileDataSystem;
+namespace ff.State.Implements.FileDataSystem;
 
 /// <summary>
 ///     Wrapper for <see cref="FileSystemInfo"/> that contains additional information (e.g. <see cref="IsParent"/>)
@@ -18,7 +18,7 @@ public class FileSystemItem: IItem
     public string FullName => FileSystemInfo.FullName;
 
     public bool IsLeaf => !IsDir;
-    public IDataSystem DataSystem => FileSystem.FileDataSystem.Instance;
+    public IDataSystem DataSystem => FileDataSystem.Instance;
     public bool IsSelected { get; set; }
     public IDictionary<string, string> Properties
     {

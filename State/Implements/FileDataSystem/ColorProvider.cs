@@ -1,6 +1,6 @@
 ﻿using Terminal.Gui.FileServices;
 
-namespace ff.State.FileDataSystem;
+namespace ff.State.Implements.FileDataSystem;
 
 public class ColorProvider : FileSystemColorProvider
 {
