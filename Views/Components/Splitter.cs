@@ -1,4 +1,4 @@
-﻿namespace ff.Views;
+﻿namespace ff.Views.Components;
 
 public sealed class Splitter : View
 {

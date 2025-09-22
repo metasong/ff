@@ -1,6 +1,7 @@
 ﻿using ff;
 using ff.Localization;
 using ff.Views;
+using ff.Views.Components;
 
 namespace TerminalFileManager;
 

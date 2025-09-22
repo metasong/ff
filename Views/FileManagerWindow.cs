@@ -1,4 +1,6 @@
-﻿namespace ff.Views;
+﻿using ff.Views.Components;
+
+namespace ff.Views;
 
 public class FileManagerWindow : Window
 {
